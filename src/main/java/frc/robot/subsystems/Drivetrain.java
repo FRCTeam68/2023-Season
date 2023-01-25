@@ -243,7 +243,7 @@ public class Drivetrain implements Subsystem {
     public String getId() {
         return "Drivetrain";
     }
-
+/* 
     @Override
     public void outputTelemetry(double timestamp) {
         SmartDashboard.putString("drivetrain/wantedStateAPI", this.wantedState.toString());
@@ -266,15 +266,15 @@ public class Drivetrain implements Subsystem {
         SmartDashboard.putNumber("drivetrain/chassisVy", periodicIO.chassisVy);
         SmartDashboard.putNumber("drivetrain/goalVx", periodicIO.goalVx);
         SmartDashboard.putNumber("drivetrain/goalVy", periodicIO.goalVy);
-        /* 
+        
         for(SwerveModule mod : mSwerveMods){
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
-        */
+        
     }
-
+*/
     public void setWantedState(WantedState wantedState)
     {
         this.wantedState = wantedState;
@@ -304,11 +304,6 @@ public class Drivetrain implements Subsystem {
         return(Math.abs(periodicIO.VxCmd) < Constants.DEADBAND
                 && Math.abs(periodicIO.VyCmd) < Constants.DEADBAND
                 && Math.abs(periodicIO.WzCmd) < Constants.DEADBAND);
-    }
-
-    public Rotation2d getGyroscopeRotation() {
-        Rotation2d temp = Rotation2d.fromDegrees(periodicIO.adjustedYaw);
-        return temp;
     }
 
     public Pose2d getPose() {
