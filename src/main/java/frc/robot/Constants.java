@@ -204,4 +204,10 @@ public final class Constants {
         public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 16; // FIXME Set back right steer encoder ID
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -(6.2439-1.2+2.9-0.69); // FIXME Measure and set back right steer offset
     }
+
+    public final static class INTAKE {
+        public static final int INTAKE_MOTOR = 12;
+
+        public static final NeutralMode INTAKE_NEUTRAL_MODE = NeutralMode.Brake;
+    }
 }

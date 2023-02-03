@@ -33,6 +33,7 @@ public class RobotContainer {
 	private final SubsystemManager manager;
 
 	private final Drivetrain drivetrain;
+	private final Intake intake;
 
 	private SendableChooser<Command> autonChooser;
 
@@ -56,12 +57,13 @@ public class RobotContainer {
 		LiveWindow.setEnabled(false);
 
 		drivetrain = new Drivetrain(driverController);
+		intake = new Intake(operatorController);
 
 		
 
 		manager = new SubsystemManager(0.02);
 
-		manager.setSubsystems(drivetrain);
+		manager.setSubsystems(intake);
 
 		configureButtonBindings();
 		configureAuton();
