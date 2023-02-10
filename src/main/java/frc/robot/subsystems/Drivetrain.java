@@ -243,7 +243,7 @@ public class Drivetrain implements Subsystem {
     public String getId() {
         return "Drivetrain";
     }
-/* 
+
     @Override
     public void outputTelemetry(double timestamp) {
         SmartDashboard.putString("drivetrain/wantedStateAPI", this.wantedState.toString());
@@ -274,7 +274,7 @@ public class Drivetrain implements Subsystem {
         }
         
     }
-*/
+
     public void setWantedState(WantedState wantedState)
     {
         this.wantedState = wantedState;
