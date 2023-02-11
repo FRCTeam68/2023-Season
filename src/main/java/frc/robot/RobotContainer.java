@@ -11,9 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.loops.SubsystemManager;
+import frc.robot.subsystems.*;
 
-
-import java.nio.file.Path;
 
 
 /**
@@ -30,6 +29,9 @@ public class RobotContainer {
 	public final XboxController operatorController;
 
 	private final SubsystemManager manager;
+
+	// not needed for intake,  private final Drivetrain drivetrain;
+	private final Intake intake;
 
 	private SendableChooser<Command> autonChooser;
 
@@ -52,11 +54,14 @@ public class RobotContainer {
 		LiveWindow.disableAllTelemetry();
 		LiveWindow.setEnabled(false);
 
+		// not needed for intake,  drivetrain = new Drivetrain(driverController);
+		intake = new Intake(driverController);
+
 		
 
 		manager = new SubsystemManager(0.02);
 
-		manager.setSubsystems();
+		manager.setSubsystems(intake);
 
 		configureButtonBindings();
 		configureAuton();
