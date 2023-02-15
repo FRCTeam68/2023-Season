@@ -68,7 +68,10 @@ public class Intake implements Subsystem {
         if (controller.getAButtonPressed())
             wantedState = (currentState != SystemState.IDLE) ? WantedState.IDLE : WantedState.INTAKING;
 
-        else if (controller.getBButtonPressed())
+        if (currentState == SystemState.INTAKING && getIntakeCurrent() > 150)
+            wantedState = WantedState.IDLE;
+
+        if (controller.getBButtonPressed())
             wantedState = (currentState != SystemState.IDLE) ? WantedState.IDLE : WantedState.PLACING;
 
 
@@ -79,10 +82,11 @@ public class Intake implements Subsystem {
         switch(currentState){
 
             case INTAKING:
-                setIntakeSpeed(-.45);
+                setIntakeSpeed(-.5);
                 break;
             case PLACING:
-                setIntakeSpeed(.45);
+                setIntakeSpeed(.5);
+                break;
             default:
             case IDLE:
                 setIntakeSpeed(0);
