@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,23 +13,21 @@ public class Intake implements Subsystem {
 
     private enum SystemState{
         IDLE,   
-        MANUAL_CONTROL,           //X,Y axis speeds relative to field
+        INTAKING,
+        PLACING
+        
     }
 
     public enum WantedState{
         IDLE,
-        MANUAL_CONTROL
+        INTAKING,
+        PLACING
     }
 
-    private SystemState currentState = SystemState.MANUAL_CONTROL;
-    private WantedState wantedState = WantedState.MANUAL_CONTROL;
+    private SystemState currentState = SystemState.IDLE;
+    private WantedState wantedState = WantedState.IDLE;
 
     private double currentStateStartTime = 0;
-    private double currentTime = 0, graceTime = 0.020;
-
-    private boolean holding = false;
-    private double pastCurrent = 0;
-    private double currentCurrent = 0;
 
     private TalonFX intakeMotor;
 
@@ -39,114 +36,88 @@ public class Intake implements Subsystem {
 
     public Intake(XboxController controller){
         intakeMotor = new TalonFX(Constants.INTAKE.INTAKE_MOTOR);
-        
-        //intakeMotor.configPeakOutputForward(1);
-        //intakeMotor.configPeakOutputReverse(-1);
-        intakeMotor.setNeutralMode(Constants.INTAKE.INTAKE_NEUTRAL_MODE);
-        
+
+        intakeMotor.configPeakOutputForward(1);
+        intakeMotor.configPeakOutputReverse(-1);
+        intakeMotor.setNeutralMode(Constants.INTAKE.INTAKE_NEUTRAL_MODE); 
         this.controller = controller;
     }
 
     @Override
     public void processLoop(double timestamp) {
         // TODO Auto-generated method stub
-        currentTime = timestamp;
         SystemState newState;
         switch (currentState){
             default:
-            case MANUAL_CONTROL:
+            case INTAKING:
                 newState = handleManual();
                 break;
             case IDLE:
                 newState = handleManual();
                 break;
-      
+
         }
         if (newState != currentState) {
 			currentState = newState;
 			currentStateStartTime = timestamp;
 		}
-
     }
 
     @Override
     public void readPeriodicInputs(double timestamp){
-        
-        wantedState = (Math.abs(controller.getRightX())>Constants.DEADBAND) ? WantedState.MANUAL_CONTROL : WantedState.IDLE;
-                
+        if (controller.getAButtonPressed())
+            wantedState = (currentState != SystemState.IDLE) ? WantedState.IDLE : WantedState.INTAKING;
+
+        else if (controller.getBButtonPressed())
+            wantedState = (currentState != SystemState.IDLE) ? WantedState.IDLE : WantedState.PLACING;
+
+
     }
 
     @Override
     public void writePeriodicOutputs(double timestamp){
         switch(currentState){
-            
-            case MANUAL_CONTROL:
-                setIntakeSpeed(controller.getRightX());
-                holding = idleHold(timestamp);
+
+            case INTAKING:
+                setIntakeSpeed(-.45);
                 break;
-            case IDLE:
-                setIntakeSpeed(-0.09);
-                // if (holding){
-                //     intakeMotor.set(ControlMode.Current, 18);
-                // }                
-                break;
+            case PLACING:
+                setIntakeSpeed(.45);
             default:
-            
+            case IDLE:
+                setIntakeSpeed(0);
+                break;
         }
     }
 
-    public boolean idleHold(double timestamp){
-        if ((timestamp - currentStateStartTime) < graceTime)
-            return false;
-
-        if (intakeMotor.getStatorCurrent() > 24){
-            
-            return true;
-        }
-        
-        return false;
-    }
-
-    private SystemState defaultStateChange() {
-		switch (wantedState){
-            case IDLE:
-                return SystemState.IDLE;
-            default:
-            case MANUAL_CONTROL:
-                return SystemState.MANUAL_CONTROL;
-		}
-	}
 
     private SystemState handleManual(){
-        return defaultStateChange();
+        switch (wantedState){
+            case INTAKING:
+                return SystemState.INTAKING;
+            case PLACING:
+                return SystemState.PLACING;
+            default:
+            case IDLE:
+                return SystemState.IDLE;
+		}
     }
 
     public void setIntakeSpeed(double speed){
         intakeMotor.set(ControlMode.PercentOutput, speed);
-        // intakeMotor.set(ControlMode.Current, 18);
-
     }
-
+    public double getIntakeCurrent(){
+        return intakeMotor.getStatorCurrent();
+    }
     @Override
     public void outputTelemetry(double timestamp){
-        SmartDashboard.putNumber("Bus Voltage", intakeMotor.getBusVoltage());
-        SmartDashboard.putNumber("Motor Voltage", intakeMotor.getMotorOutputVoltage());
-        SmartDashboard.putNumber("Current Stator Current", intakeMotor.getStatorCurrent());
-        SmartDashboard.putNumber("Motor Output Voltage", intakeMotor.getMotorOutputVoltage());
-        SmartDashboard.putNumber("Motor Output Percentage", intakeMotor.getMotorOutputPercent());
-        SmartDashboard.putNumber("Motor Sensor Velocity", intakeMotor.getSelectedSensorVelocity());
-        SmartDashboard.putNumber("Motor Sensor Position", intakeMotor.getSelectedSensorPosition());
+        SmartDashboard.putNumber("Current Stator Current", getIntakeCurrent());
         SmartDashboard.putNumber("Supply Current", intakeMotor.getSupplyCurrent());
-        SmartDashboard.putString("Wanted State", wantedState.name());
-        SmartDashboard.putString("Current State", currentState.name());
-        SmartDashboard.putBoolean("HOldinge", holding);
-        SmartDashboard.putNumber("Current Time", timestamp);
     }
-
     @Override
     public void stop() {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -158,7 +129,7 @@ public class Intake implements Subsystem {
     @Override
     public void zeroSensors() {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -170,5 +141,5 @@ public class Intake implements Subsystem {
     public void setWantedState(WantedState wantedState) {
 		this.wantedState = wantedState;
 	}
-    
+
 }
