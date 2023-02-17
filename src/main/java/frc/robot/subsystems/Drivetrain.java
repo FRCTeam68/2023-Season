@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -56,16 +57,18 @@ public class Drivetrain implements Subsystem {
     private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
     public SwerveDriveOdometry odometry; 
-    //public SwerveModuleState[] trajectoryStates = new SwerveModuleState[4];
+    public SwerveModuleState[] trajectoryStates = new SwerveModuleState[4];
 
     private enum SystemState{
         IDLE,   
-        MANUAL_CONTROL,           //X,Y axis speeds relative to field
+        MANUAL_CONTROL,
+        TRAJECTORY_FOLLOWING           //X,Y axis speeds relative to field
     }
 
     public enum WantedState{
         IDLE,
-        MANUAL_CONTROL
+        MANUAL_CONTROL,
+        TRAJECTORY_FOLLOWING
     }
 
     private static class PeriodicIO {
@@ -143,6 +146,9 @@ public class Drivetrain implements Subsystem {
             case MANUAL_CONTROL:
                 newState = handleManualControl();
                 break;
+            case TRAJECTORY_FOLLOWING:
+                newState = handleTrajectoryFollowing();
+                break;
             case IDLE:
                 newState = handleManualControl();
                 break;
@@ -187,6 +193,9 @@ public class Drivetrain implements Subsystem {
     {
         SwerveModuleState[] moduleStates = new SwerveModuleState[4];
         switch(currentState){
+            case TRAJECTORY_FOLLOWING:
+                moduleStates = trajectoryStates;
+                break;
             case MANUAL_CONTROL:
                 moduleStates = drive(periodicIO.VxCmd, periodicIO.VyCmd, -controller.getRightX()*.5, !periodicIO.robotOrientedModifier);
                 break;
@@ -209,6 +218,8 @@ public class Drivetrain implements Subsystem {
 		switch (wantedState){
             /*case IDLE:
                 return SystemState.IDLE;*/
+            case TRAJECTORY_FOLLOWING:
+				return SystemState.TRAJECTORY_FOLLOWING;
             default:
             case MANUAL_CONTROL:
                 return SystemState.MANUAL_CONTROL;
@@ -280,6 +291,12 @@ public class Drivetrain implements Subsystem {
         this.wantedState = wantedState;
     }
 
+    public void initAutonPosition(PathPlannerTrajectory.PathPlannerState state){
+        zeroGyroscope();
+        //ErrorCode errorCode = pigeon.setYaw(state.holonomicRotation.getDegrees(), 100);
+        odometry.resetPosition(getYaw(), getModulePositions(), new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation));
+    }
+
     public void zeroGyroscope() {
         ahrs.zeroYaw();
         gyroOffset = 0;
@@ -293,10 +310,16 @@ public class Drivetrain implements Subsystem {
         }
     } 
 
-
+    public void setModuleStatesFromTrajectory(SwerveModuleState[] states){
+        trajectoryStates = states;
+    }
     
     private SystemState handleManualControl(){
 
+        return defaultStateChange();
+    }
+
+    private SystemState handleTrajectoryFollowing(){
         return defaultStateChange();
     }
 
