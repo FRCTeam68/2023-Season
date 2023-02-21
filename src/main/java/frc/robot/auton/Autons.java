@@ -11,8 +11,19 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.auton.commands.*;
 
+import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain;
 
 public class Autons {
-    
+    private static final PathPlannerTrajectory straightLine = PathPlanner.loadPath("striahgtlinetest", Constants.AutoConstants.kMaxSpeedMetersPerSecond, Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
+
+
+public static Command test(Drivetrain driveTrain){
+    final PathPlannerCommand straightLineTest = new PathPlannerCommand(straightLine, driveTrain, true);
+
+    return new SequentialCommandGroup(
+    new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)) 
+    );
+}
+
 }
