@@ -59,7 +59,7 @@ public class RobotContainer {
 		
 
 		manager = new SubsystemManager(0.02);
-		arm = new Arm(driverController);
+		arm = new Arm(operatorController);
 
 		manager.setSubsystems(arm);
 

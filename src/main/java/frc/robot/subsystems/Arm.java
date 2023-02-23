@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
@@ -50,9 +51,9 @@ public class Arm implements Subsystem {
 
     private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
-    private final XboxController controller;
+    private final PS4Controller controller;
 
-    public Arm(XboxController controller){
+    public Arm(PS4Controller controller){
 
         this.controller = controller;
 
@@ -154,13 +155,13 @@ public class Arm implements Subsystem {
         if(rotateLimitSwitch.get())
             zeroRotateSensors();
 
-       if(controller.getAButtonPressed())
+       if(controller.getCrossButtonPressed())
             setWantedState(SystemState.NEUTRAL);
 
-       if(controller.getBButtonPressed())
+       if(controller.getCircleButtonPressed())
             setWantedState(SystemState.GROUND_ANGLE);
 
-        if(controller.getYButtonPressed())
+        if(controller.getTriangleButtonPressed())
             setWantedState(SystemState.PLACING);
 
     }
