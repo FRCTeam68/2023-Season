@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
@@ -31,11 +32,11 @@ public class Intake implements Subsystem {
 
     private TalonFX intakeMotor;
 
-    private final XboxController controller;
+    private final PS4Controller controller;
 
 
-    public Intake(XboxController controller){
-        intakeMotor = new TalonFX(Constants.INTAKE.INTAKE_MOTOR);
+    public Intake(PS4Controller controller){
+        intakeMotor = new TalonFX(Constants.INTAKE.INTAKE_MOTOR, "MANIPbus");
 
         intakeMotor.configPeakOutputForward(1);
         intakeMotor.configPeakOutputReverse(-1);
@@ -52,6 +53,9 @@ public class Intake implements Subsystem {
             case INTAKING:
                 newState = handleManual();
                 break;
+            case PLACING:
+                newState = handleManual();
+                break;
             case IDLE:
                 newState = handleManual();
                 break;
@@ -65,13 +69,13 @@ public class Intake implements Subsystem {
 
     @Override
     public void readPeriodicInputs(double timestamp){
-        if (controller.getAButtonPressed())
+        if (controller.getCrossButtonPressed())
             wantedState = (currentState != SystemState.IDLE) ? WantedState.IDLE : WantedState.INTAKING;
 
         if (currentState == SystemState.INTAKING && getIntakeCurrent() > 150)
             wantedState = WantedState.IDLE;
 
-        if (controller.getBButtonPressed())
+        if (controller.getCircleButtonPressed())
             wantedState = (currentState != SystemState.IDLE) ? WantedState.IDLE : WantedState.PLACING;
 
 

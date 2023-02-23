@@ -26,7 +26,7 @@ public class RobotContainer {
 	private static RobotContainer INSTANCE;
 
 	public final XboxController driverController;
-	public final XboxController operatorController;
+	public final PS4Controller operatorController;
 
 	private final SubsystemManager manager;
 
@@ -49,13 +49,13 @@ public class RobotContainer {
 	public RobotContainer() {
 		INSTANCE = this;
 		driverController = new XboxController(0);
-		operatorController = new XboxController(1);
+		operatorController = new PS4Controller(1);
 		// Configure the button bindings
 		LiveWindow.disableAllTelemetry();
 		LiveWindow.setEnabled(false);
 
 		// not needed for intake,  drivetrain = new Drivetrain(driverController);
-		intake = new Intake(driverController);
+		intake = new Intake(operatorController);
 
 		
 
