@@ -33,6 +33,7 @@ public class RobotContainer {
 	private final SubsystemManager manager;
 
 	private final Drivetrain drivetrain;
+	private final Limelight limelight;
 
 	private SendableChooser<Command> autonChooser;
 
@@ -55,13 +56,14 @@ public class RobotContainer {
 		LiveWindow.disableAllTelemetry();
 		LiveWindow.setEnabled(false);
 
-		drivetrain = new Drivetrain(driverController);
+		limelight = new Limelight(driverController);
+		drivetrain = new Drivetrain(driverController,limelight);
 
 		
 
 		manager = new SubsystemManager(0.02);
 
-		manager.setSubsystems(drivetrain);
+		manager.setSubsystems(limelight, drivetrain);
 
 		configureButtonBindings();
 		configureAuton();

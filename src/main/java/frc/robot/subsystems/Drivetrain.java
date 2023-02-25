@@ -51,7 +51,7 @@ public class Drivetrain implements Subsystem {
 
  
     private final AHRS ahrs = new AHRS(SPI.Port.kMXP, (byte) 200);
-    private double gyroOffset;
+    private double gyroOffset = 180.0;
 
     private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
@@ -110,13 +110,14 @@ public class Drivetrain implements Subsystem {
     private WantedState wantedState = WantedState.MANUAL_CONTROL;
 
     private final XboxController controller;
+    private final Limelight limelight;
 
     private double currentStateStartTime;
 
     private double[] autoDriveSpeeds = new double[2];
     public SwerveModule[] mSwerveMods;   
 
-    public Drivetrain(XboxController controller) {
+    public Drivetrain(XboxController controller, Limelight limelight) {
         ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
         //yawCtrl.enableContinuousInput(-Math.PI, Math.PI);  //TODO check if Pigeon output rolls over 
 
@@ -127,6 +128,7 @@ public class Drivetrain implements Subsystem {
         new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
         this.controller = controller;
+        this.limelight = limelight;
 
         resetModulesToAbsolute();
         odometry = new SwerveDriveOdometry(m_kinematics, getYaw(), getModulePositions());
@@ -188,7 +190,7 @@ public class Drivetrain implements Subsystem {
         SwerveModuleState[] moduleStates = new SwerveModuleState[4];
         switch(currentState){
             case MANUAL_CONTROL:
-                moduleStates = drive(periodicIO.VxCmd, periodicIO.VyCmd, controller.getRightX()*.5, !periodicIO.robotOrientedModifier);
+                moduleStates = drive(periodicIO.VxCmd, periodicIO.VyCmd, controller.getRightX()*.5 + limelight.steeringAdjust(), !periodicIO.robotOrientedModifier); //controller.getRightX()*.5
                 break;
             default:
             case IDLE:
@@ -243,9 +245,10 @@ public class Drivetrain implements Subsystem {
     public String getId() {
         return "Drivetrain";
     }
-/* 
+
     @Override
     public void outputTelemetry(double timestamp) {
+        /* 
         SmartDashboard.putString("drivetrain/wantedStateAPI", this.wantedState.toString());
         SmartDashboard.putNumber("drivetrain/heading",periodicIO.adjustedYaw);
         SmartDashboard.putString("drivetrain/pose",odometry.getPoseMeters().toString());
@@ -256,7 +259,9 @@ public class Drivetrain implements Subsystem {
         SmartDashboard.putNumber("drivetrain/WzCmd", periodicIO.WzCmd);
         SmartDashboard.putNumber("driverController/LeftY", controller.getLeftY());
         SmartDashboard.putNumber("driverController/LeftX", controller.getLeftX());
+        */
         SmartDashboard.putNumber("driverController/RightX", controller.getRightX());
+       /* 
         SmartDashboard.putString("drivetrain/currentStateOutputs", currentState.toString());
         SmartDashboard.putString("drivetrain/wantedStateOutputs", wantedState.toString());
         SmartDashboard.putNumber("drivetrain/goalLimelightAngleError", periodicIO.limelightAngleError);
@@ -266,15 +271,15 @@ public class Drivetrain implements Subsystem {
         SmartDashboard.putNumber("drivetrain/chassisVy", periodicIO.chassisVy);
         SmartDashboard.putNumber("drivetrain/goalVx", periodicIO.goalVx);
         SmartDashboard.putNumber("drivetrain/goalVy", periodicIO.goalVy);
-        
+         
         for(SwerveModule mod : mSwerveMods){
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
-        
+      */  
     }
-*/
+
     public void setWantedState(WantedState wantedState)
     {
         this.wantedState = wantedState;
@@ -282,7 +287,6 @@ public class Drivetrain implements Subsystem {
 
     public void zeroGyroscope() {
         ahrs.zeroYaw();
-        gyroOffset = 0;
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -370,7 +374,7 @@ public class Drivetrain implements Subsystem {
           }
        //
        //    // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
-          return Rotation2d.fromDegrees(360.0 - ahrs.getYaw());
+          return Rotation2d.fromDegrees(360.0 - (ahrs.getYaw()+gyroOffset));
     }
 
     @Override
