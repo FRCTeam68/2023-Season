@@ -3,8 +3,8 @@ package frc.robot;
 public final class Constants {
     public static final class Arm {
         public static final int LIFTMOTOR = 13;
-        public static final int ROTATELEFTMOTOR = 11;
-        public static final int ROTATERIGHTMOTOR = 12;
+        public static final int ROTATEMOTORLEFT = 11;
+        public static final int ROTATEMOTORRIGHT = 12;
         public static final int LIFTENCODER = 20;
         public static final int ROTATEENCODER = 21;
 

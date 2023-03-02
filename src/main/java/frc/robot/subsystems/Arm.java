@@ -54,7 +54,7 @@ public class Arm implements Subsystem {
     protected MotionMagicVoltage m_rotateMotorLeftMMV;
     protected TalonFX m_rotateMotorRight;
     protected MotionMagicVoltage m_rotateMotorRightMMV;
-    protected CANcoder m_rotateEncoder;
+    // protected CANcoder m_rotateEncoder;
     protected DigitalInput m_rotateLimitSwitch;
 
     // protected ElevatorFeedforward m_feedforward;
@@ -79,7 +79,7 @@ public class Arm implements Subsystem {
         rotateRightMotorInit();
         m_rotateMotorRight.setControl(new Follower(m_rotateMotorLeft.getDeviceID(), false));
 
-        rotateEncoderInit();
+        // rotateEncoderInit();
         m_rotateLimitSwitch = new DigitalInput(1);
         //--------------------------------------------------------------------- 
 
@@ -99,21 +99,21 @@ public class Arm implements Subsystem {
         cfg.MotionMagic.MotionMagicAcceleration = 10; // Take approximately 0.5 seconds to reach max vel
         cfg.MotionMagic.MotionMagicJerk = 50;   
 
-        cfg.Slot0.kP = .125F;
-        cfg.Slot0.kI = 2.0F;
+        cfg.Slot0.kP = 2F;
+        cfg.Slot0.kI = 0.0F;
         cfg.Slot0.kD = 0.0F;
         cfg.Slot0.kV = 0.0F;
         cfg.Slot0.kS = 0.25F; // Approximately 0.25V to get the mechanism moving
 
-        cfg.Feedback.SensorToMechanismRatio = 12.8F;
+        cfg.Feedback.SensorToMechanismRatio = 2F;
     
-        cfg.Voltage.PeakForwardVoltage = 3.2; //3.2V is 20% of 16V
-        cfg.Voltage.PeakForwardVoltage = -3.2; //3.2V is 20% of 16V
+        // cfg.Voltage.PeakForwardVoltage = 3.2; //3.2V is 20% of 16V
+        // cfg.Voltage.PeakForwardVoltage = -3.2; //3.2V is 20% of 16V
         // liftMotor.configPeakOutputForward(0.2);
         // liftMotor.configPeakOutputReverse(-0.2);
 
-        cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
-        cfg.CurrentLimits.SupplyCurrentLimit = 15.0;
+        // cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
+        // cfg.CurrentLimits.SupplyCurrentLimit = 15.0;
         // liftMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true,10,15,0.5));
 
         StatusCode status = StatusCode.StatusCodeNotInitialized;
@@ -125,14 +125,14 @@ public class Arm implements Subsystem {
           System.out.println("Could not configure lift motor. Error: " + status.toString());
         }
 
-        m_liftMotorMMV.OverrideBrakeDurNeutral = true;
+        // m_liftMotorMMV.OverrideBrakeDurNeutral = true;
         // liftMotor.setNeutralMode(NeutralMode.Brake);
         m_liftMotor.setRotorPosition(0);
         m_liftMotor.setVoltage(0);
     }
 
     private void rotateLeftMotorInit(){
-        m_rotateMotorLeft = new TalonFX(Constants.Arm.ROTATELEFTMOTOR, "MANIPbus");
+        m_rotateMotorLeft = new TalonFX(Constants.Arm.ROTATEMOTORLEFT, "MANIPbus");
         m_rotateMotorLeftMMV = new MotionMagicVoltage(0);
         
         TalonFXConfiguration cfg = new TalonFXConfiguration();
@@ -141,13 +141,13 @@ public class Arm implements Subsystem {
         cfg.MotionMagic.MotionMagicAcceleration = 10; // Take approximately 0.5 seconds to reach max vel
         cfg.MotionMagic.MotionMagicJerk = 50;   
 
-        cfg.Slot0.kP = .125F;
-        cfg.Slot0.kI = 2.0F;
+        cfg.Slot0.kP = 2.0F;
+        cfg.Slot0.kI = 0.0F;
         cfg.Slot0.kD = 0.0F;
         cfg.Slot0.kV = 0.0F;
         cfg.Slot0.kS = 0.25F; // Approximately 0.25V to get the mechanism moving
 
-        cfg.Feedback.SensorToMechanismRatio = 12.8F;
+        cfg.Feedback.SensorToMechanismRatio = 4.0F;
 
         // cfg.Voltage.PeakForwardVoltage = 3.2; //3.2V is 20% of 16V
         // cfg.Voltage.PeakForwardVoltage = -3.2; //3.2V is 20% of 16V
@@ -170,7 +170,7 @@ public class Arm implements Subsystem {
     }
 
     private void rotateRightMotorInit(){
-        m_rotateMotorRight = new TalonFX(Constants.Arm.ROTATERIGHTMOTOR, "MANIPbus");
+        m_rotateMotorRight = new TalonFX(Constants.Arm.ROTATEMOTORRIGHT, "MANIPbus");
         m_rotateMotorRightMMV = new MotionMagicVoltage(0);  
 
         TalonFXConfiguration cfg = new TalonFXConfiguration();
@@ -179,12 +179,14 @@ public class Arm implements Subsystem {
         cfg.MotionMagic.MotionMagicAcceleration = 10; // Take approximately 0.5 seconds to reach max vel
         cfg.MotionMagic.MotionMagicJerk = 50;   
 
-        cfg.Slot0.kP = .125F;
-        cfg.Slot0.kI = 2.0F;
+        cfg.Slot0.kP = 2.0F;
+        cfg.Slot0.kI = 0.0F;
         cfg.Slot0.kD = 0.0F;
         cfg.Slot0.kV = 0.0F;
         cfg.Slot0.kS = 0.25F; // Approximately 0.25V to get the mechanism moving
     
+        cfg.Feedback.SensorToMechanismRatio = 4.0F;
+        
         // cfg.Voltage.PeakForwardVoltage = 3.2; //3.2V is 20% of 16V
         // cfg.Voltage.PeakForwardVoltage = -3.2; //3.2V is 20% of 16V
 
@@ -220,39 +222,42 @@ public class Arm implements Subsystem {
         m_liftEncoder.getVelocity().setUpdateFrequency(100);
     }
 
-    private void rotateEncoderInit(){
-        m_rotateEncoder = new CANcoder(Constants.Arm.ROTATEENCODER, "MANIPbus");
+    // private void rotateEncoderInit(){
+    //     m_rotateEncoder = new CANcoder(Constants.Arm.ROTATEENCODER, "MANIPbus");
 
-        /* Configure CANcoder */
-        var cfg = new CANcoderConfiguration();
+    //     /* Configure CANcoder */
+    //     var cfg = new CANcoderConfiguration();
 
-        /* User can change the configs if they want, or leave it empty for factory-default */
+    //     /* User can change the configs if they want, or leave it empty for factory-default */
 
-        m_rotateEncoder.getConfigurator().apply(cfg);
+    //     m_rotateEncoder.getConfigurator().apply(cfg);
 
-        /* Speed up signals to an appropriate rate */
-        m_rotateEncoder.getPosition().setUpdateFrequency(100);
-        m_rotateEncoder.getVelocity().setUpdateFrequency(100);
-    }
+    //     /* Speed up signals to an appropriate rate */
+    //     m_rotateEncoder.getPosition().setUpdateFrequency(100);
+    //     m_rotateEncoder.getVelocity().setUpdateFrequency(100);
+    // }
     
     @Override
     public void readPeriodicInputs(double timestamp) {
  
-        if(!m_liftLimitSwitch.get())
-            zeroLiftSensor();
+        // if(!m_liftLimitSwitch.get())
+        //     zeroLiftSensor();
 
-        if(m_rotateLimitSwitch.get())
-            zeroRotateSensors();
+        // if(m_rotateLimitSwitch.get())
+        //     zeroRotateSensors();
 
-       if(m_controller.getCrossButtonPressed())
+       if(m_controller.getCrossButtonPressed()){
             setWantedState(SystemState.NEUTRAL);
-
-       if(m_controller.getCircleButtonPressed())
+            System.out.println("cross pressed - Neutral state");
+        }
+       if(m_controller.getCircleButtonPressed()){
             setWantedState(SystemState.GROUND_ANGLE);
-
-        if(m_controller.getTriangleButtonPressed())
+            System.out.println("circle pressed - ground angle state");
+        }
+        if(m_controller.getTriangleButtonPressed()){
             setWantedState(SystemState.PLACING);
-
+            System.out.println("triangle pressed - placing state");
+        }  
     }
 
     @Override
@@ -285,14 +290,14 @@ public class Arm implements Subsystem {
     {
         switch (m_currentState){
             case GROUND_ANGLE:
-                configRotate(-80000); //target -75200
+                configRotate(-6.0); //target -75200
                 break;
             //case HUMAN_FOLD:
               //  configRotate(-100000);
               //  break;
              case PLACING:
-                configRotate(-50000);
-                configLift(50000);
+                // configRotate(-50000);
+                configLift(5.5);
                 break;
             default:
             case NEUTRAL:
@@ -316,13 +321,15 @@ public class Arm implements Subsystem {
     public void outputTelemetry(double timestamp){
         // double calced = m_feedforward.calculate(m_setpoint.position);
 
+        
+        // SmartDashboard.putData("Arm State", m_currentState)
         SmartDashboard.putBoolean("LiftLimitSwitch", m_liftLimitSwitch.get());
         SmartDashboard.putBoolean("RotateLimitSwitch", m_rotateLimitSwitch.get());
         SmartDashboard.putString("Lift Pos", m_liftMotor.getPosition().toString());
         SmartDashboard.putString("Rotate Left Pos", m_rotateMotorLeft.getPosition().toString());
         SmartDashboard.putString("Rotate Right Pos", m_rotateMotorLeft.getPosition().toString());
         SmartDashboard.putString("Lift Encoder Pos", m_liftEncoder.getPosition().toString());
-        SmartDashboard.putString("Rotate Encoder Pos", m_rotateEncoder.getPosition().toString());
+        // SmartDashboard.putString("Rotate Encoder Pos", m_rotateEncoder.getPosition().toString());
     }
 
         
@@ -347,7 +354,7 @@ public class Arm implements Subsystem {
 
     public void configLift(double position){
         m_liftMotor.setControl(m_liftMotorMMV.withPosition(position));
-        //m_liftMotor.setRotorPosition(position);
+        // m_liftMotor.setRotorPosition(position);
         //below is from Phoenix v5
         // liftMotor.set(ControlMode.Position, position);
     }
@@ -378,7 +385,7 @@ public class Arm implements Subsystem {
     }
     public void zeroRotateSensors(){
         m_rotateMotorLeft.setControl(m_rotateMotorLeftMMV.withPosition(0));
-        m_rotateMotorRight.setControl(m_rotateMotorRightMMV.withPosition(0));
+        // m_rotateMotorRight.setControl(m_rotateMotorRightMMV.withPosition(0));
         //below is from Phoenix v5
         // rotateMotorLeft.setSelectedSensorPosition(0);
         // rotateMotorRight.setSelectedSensorPosition(0);
