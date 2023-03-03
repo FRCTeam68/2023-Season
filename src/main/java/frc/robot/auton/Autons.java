@@ -22,7 +22,9 @@ public static Command test(Drivetrain driveTrain){
     final PathPlannerCommand straightLineTest = new PathPlannerCommand(straightLine, driveTrain, true);
 
     return new SequentialCommandGroup(
-    new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)) 
+    new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
+    new WaitCommand(3),
+    straightLineTest 
     );
 }
 

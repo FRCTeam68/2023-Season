@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.auton.Autons;
 import frc.robot.loops.SubsystemManager;
 import frc.robot.subsystems.*;
 
@@ -85,7 +86,9 @@ public class RobotContainer {
 	}
 
 	private void configureAuton() {
-		
+		autonChooser = new SendableChooser<>();
+		autonChooser.addOption("Straight Line Test", Autons.test(drivetrain));
+		SmartDashboard.putData("auton/chooser",autonChooser);
 
 	}
 

@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 
 
@@ -14,6 +15,8 @@ public class Robot extends TimedRobot {
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
+  private Command autonomousCommand;
+
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   public static CTREConfigs ctreConfigs;
@@ -36,14 +39,18 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_robotContainer.stopSubsystems();
-		m_robotContainer.enableState = RobotContainer.EnableState.DISABLED;
-    m_autoSelected = m_chooser.getSelected();
-    System.out.println("Auto selected: " + m_autoSelected);
+    m_robotContainer.enableState = RobotContainer.EnableState.AUTON;
+    
+    autonomousCommand = m_robotContainer.getAutonChooser().getSelected();
+
+    if (autonomousCommand != null) {
+			autonomousCommand.schedule();
+		}
   }
 
   @Override
   public void autonomousPeriodic() {
+   /* 
     switch (m_autoSelected) {
       case kCustomAuto:
         break;
@@ -51,6 +58,7 @@ public class Robot extends TimedRobot {
       default:
         break;
     }
+    */
   }
 
   @Override

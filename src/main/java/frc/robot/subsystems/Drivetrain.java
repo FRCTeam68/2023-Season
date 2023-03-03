@@ -56,7 +56,8 @@ public class Drivetrain implements Subsystem {
 
     private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
-    public SwerveDriveOdometry odometry; 
+    private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(m_kinematics, getYaw(), getModulePositions());
+    
     public SwerveModuleState[] trajectoryStates = new SwerveModuleState[4];
 
     private enum SystemState{
@@ -132,7 +133,7 @@ public class Drivetrain implements Subsystem {
         this.controller = controller;
 
         resetModulesToAbsolute();
-        odometry = new SwerveDriveOdometry(m_kinematics, getYaw(), getModulePositions());
+        
         
         //TODO TEMPORARY
         resetOdometry();
@@ -178,15 +179,7 @@ public class Drivetrain implements Subsystem {
 
     }
 
-    private double[] chassisSpeedsGetter(){
-        double[] speeds = new double[4];
-        int i = 0;
-        for (SwerveModule m : mSwerveMods){
-            speeds[i] = m.getState().speedMetersPerSecond;
-            i++;
-        }
-        return speeds;
-    }
+    
 
     @Override
     public void writePeriodicOutputs(double timestamp)
@@ -226,6 +219,16 @@ public class Drivetrain implements Subsystem {
 		}
 	}
 
+    private double[] chassisSpeedsGetter(){
+        double[] speeds = new double[4];
+        int i = 0;
+        for (SwerveModule m : mSwerveMods){
+            speeds[i] = m.getState().speedMetersPerSecond;
+            i++;
+        }
+        return speeds;
+    }
+
     private void updateStateVariables(SwerveModuleState[] states)
     {
         stateVariables.frontLeftDriveLast = states[0].speedMetersPerSecond;
@@ -257,6 +260,7 @@ public class Drivetrain implements Subsystem {
 
     @Override
     public void outputTelemetry(double timestamp) {
+        /* 
         SmartDashboard.putString("drivetrain/wantedStateAPI", this.wantedState.toString());
         SmartDashboard.putNumber("drivetrain/heading",periodicIO.adjustedYaw);
         SmartDashboard.putString("drivetrain/pose",odometry.getPoseMeters().toString());
@@ -277,7 +281,7 @@ public class Drivetrain implements Subsystem {
         SmartDashboard.putNumber("drivetrain/chassisVy", periodicIO.chassisVy);
         SmartDashboard.putNumber("drivetrain/goalVx", periodicIO.goalVx);
         SmartDashboard.putNumber("drivetrain/goalVy", periodicIO.goalVy);
-        
+        */
         for(SwerveModule mod : mSwerveMods){
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
@@ -340,6 +344,7 @@ public class Drivetrain implements Subsystem {
 
     public void resetOdometry(){
         zeroGyroscope();
+        odometry.resetPosition(getYaw(), getModulePositions(), new Pose2d(0,0, new Rotation2d()));;
     }
 
     public SwerveDriveKinematics getKinematics() {
