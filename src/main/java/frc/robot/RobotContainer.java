@@ -33,7 +33,7 @@ public class RobotContainer {
 
 	private final SubsystemManager manager;
 
-	private final Drivetrain drivetrain;
+	public final Drivetrain drivetrain;
 	private final Intake intake;
 
 	private SendableChooser<Command> autonChooser;

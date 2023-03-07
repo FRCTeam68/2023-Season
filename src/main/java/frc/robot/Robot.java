@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.auton.Autons;
 import frc.robot.subsystems.Intake;
 
 
@@ -31,6 +32,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     m_robotContainer.startSubsystemThreads();
+    Autons.checkPath();
   }
 
   @Override
@@ -41,11 +43,13 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_robotContainer.enableState = RobotContainer.EnableState.AUTON;
     
-    autonomousCommand = m_robotContainer.getAutonChooser().getSelected();
+    autonomousCommand = Autons.test(m_robotContainer.drivetrain);
 
+    /* 
     if (autonomousCommand != null) {
 			autonomousCommand.schedule();
 		}
+    */
   }
 
   @Override

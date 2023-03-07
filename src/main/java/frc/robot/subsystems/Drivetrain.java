@@ -54,11 +54,6 @@ public class Drivetrain implements Subsystem {
     private final AHRS ahrs = new AHRS(SPI.Port.kMXP, (byte) 200);
     private double gyroOffset;
 
-    private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-
-    private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(m_kinematics, getYaw(), getModulePositions());
-    
-    public SwerveModuleState[] trajectoryStates = new SwerveModuleState[4];
 
     private enum SystemState{
         IDLE,   
@@ -118,25 +113,35 @@ public class Drivetrain implements Subsystem {
     private double currentStateStartTime;
 
     private double[] autoDriveSpeeds = new double[2];
-    public SwerveModule[] mSwerveMods;   
+    public final static int Num_Modules = 4;
+    public SwerveModule[] mSwerveMods = new SwerveModule[Num_Modules];   
+
+    private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+
+    private final SwerveDriveOdometry odometry; 
+    
+    public SwerveModuleState[] trajectoryStates = new SwerveModuleState[4];
 
     public Drivetrain(XboxController controller) {
         ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
         //yawCtrl.enableContinuousInput(-Math.PI, Math.PI);  //TODO check if Pigeon output rolls over 
 
+        
+        
         mSwerveMods = new SwerveModule[] {
         new SwerveModule(0, Constants.Swerve.Mod0.constants),
         new SwerveModule(1, Constants.Swerve.Mod1.constants),
         new SwerveModule(2, Constants.Swerve.Mod2.constants),
         new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
+        
+        odometry = new SwerveDriveOdometry(m_kinematics, getYaw(), getModulePositions());
+
         this.controller = controller;
 
         resetModulesToAbsolute();
         
-        
-        //TODO TEMPORARY
-        resetOdometry();
+
     }
 
     @Override
@@ -201,12 +206,12 @@ public class Drivetrain implements Subsystem {
         setModuleStates(moduleStates);
         updateStateVariables(moduleStates);
     }
-/* 
+
     @Override
     public void periodic() {
         
     }
-*/
+
     private SystemState defaultStateChange() {
 		switch (wantedState){
             /*case IDLE:
@@ -338,7 +343,6 @@ public class Drivetrain implements Subsystem {
     }
 
     private void updateOdometry(){
-
         odometry.update(getYaw(), getModulePositions());  
     }
 
@@ -350,7 +354,6 @@ public class Drivetrain implements Subsystem {
     public SwerveDriveKinematics getKinematics() {
         return m_kinematics;
     }
-
 
     public void setAutoDriveSpeeds(double xSpeed, double ySpeed){
         autoDriveSpeeds[0] = xSpeed;
@@ -367,8 +370,8 @@ public class Drivetrain implements Subsystem {
 
     public SwerveModulePosition[] getModulePositions(){
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
-        for(SwerveModule mod : mSwerveMods){
-            positions[mod.moduleNumber] = mod.getPosition();
+        for(int i = 0; i<4; i++){
+            positions[i] = mSwerveMods[i].getPosition();
         }
         return positions;
     }

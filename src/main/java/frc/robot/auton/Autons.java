@@ -15,17 +15,20 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain;
 
 public class Autons {
-    private static final PathPlannerTrajectory straightLine = PathPlanner.loadPath("striahgtlinetest", Constants.AutoConstants.kMaxSpeedMetersPerSecond, Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
-
+    private static final PathPlannerTrajectory straightLine = PathPlanner.loadPath("lineTest", Constants.AutoConstants.kMaxSpeedMetersPerSecond, Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
 
 public static Command test(Drivetrain driveTrain){
     final PathPlannerCommand straightLineTest = new PathPlannerCommand(straightLine, driveTrain, true);
-
+    
     return new SequentialCommandGroup(
-    new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
-    new WaitCommand(3),
+    //new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
+    //new WaitCommand(3),
     straightLineTest 
     );
+}
+public static void checkPath(){
+    long load_start = System.currentTimeMillis();
+    System.out.println(String.format("Path: [%s] to %d milliseconds.","lineTest",System.currentTimeMillis()-load_start));
 }
 
 }

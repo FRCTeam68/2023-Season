@@ -60,7 +60,7 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
   @Override
   public void initialize() {
     super.initialize();
-    this.drivetrain.setWantedState(Drivetrain.WantedState.TRAJECTORY_FOLLOWING);
+    drivetrain.setWantedState(Drivetrain.WantedState.TRAJECTORY_FOLLOWING);
 
     if(resetOdometry){
         drivetrain.initAutonPosition(trajectory.getInitialState());
