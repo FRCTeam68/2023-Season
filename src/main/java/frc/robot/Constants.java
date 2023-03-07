@@ -14,5 +14,7 @@ public final class Constants {
         // public static final int ROTATE_DEADRANGE = 0;
 
     }
-    
+    public final static class INTAKE {
+        public static final int INTAKE_MOTOR = 14;
+    }
 }

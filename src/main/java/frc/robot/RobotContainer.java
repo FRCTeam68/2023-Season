@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.loops.SubsystemManager;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Arm.SystemState;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake.WantedState;
 
 
 /**
@@ -30,10 +32,11 @@ public class RobotContainer {
 	public final PS4Controller operatorController;
 
 	private final SubsystemManager manager;
-	public static Arm arm;
+	private final Arm arm;
+	private final Intake intake;
 	
-	private JoystickButton driveA;
-	private JoystickButton driveB;
+	// private JoystickButton driveA;
+	// private JoystickButton driveB;
 
 	private SendableChooser<Command> autonChooser;
 
@@ -56,12 +59,13 @@ public class RobotContainer {
 		LiveWindow.disableAllTelemetry();
 		LiveWindow.setEnabled(false);
 
+		intake = new Intake(operatorController);
+		arm = new Arm(operatorController,intake);
 		
 
 		manager = new SubsystemManager(0.02);
-		arm = new Arm(operatorController);
 
-		manager.setSubsystems(arm);
+		manager.setSubsystems(arm, intake);
 
 		configureAuton();
 		//configureButtonAddress();
@@ -74,15 +78,15 @@ public class RobotContainer {
 
 	}
 
-	private void configureButtons(){
-		driveA.onTrue(new InstantCommand(()-> arm.setWantedState(SystemState.GROUND_ANGLE)));
+	// private void configureButtons(){
+	// 	driveA.onTrue(new InstantCommand(()-> arm.setWantedState(SystemState.GROUND_ANGLE)));
 		
-	}
+	// }
 
-	private void configureButtonAddress(){
-		driveA = new JoystickButton(driverController, 1);
-		driveB = new JoystickButton(driverController, 2);
-	}
+	// private void configureButtonAddress(){
+	// 	driveA = new JoystickButton(driverController, 1);
+	// 	driveB = new JoystickButton(driverController, 2);
+	// }
 
 	public static synchronized RobotContainer getInstance() {
 		if (INSTANCE == null) {

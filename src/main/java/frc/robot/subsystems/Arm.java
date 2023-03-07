@@ -11,6 +11,9 @@ import com.ctre.phoenixpro.hardware.TalonFX;
 // import com.ctre.phoenixpro.controls.VoltageOut;
 import com.ctre.phoenixpro.controls.Follower;
 
+import com.ctre.phoenixpro.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenixpro.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenixpro.signals.SensorDirectionValue;
 
 import com.ctre.phoenixpro.configs.CANcoderConfiguration;
 // import com.ctre.phoenixpro.configs.CurrentLimitsConfigs;
@@ -47,14 +50,14 @@ public class Arm implements Subsystem {
 
     protected TalonFX m_liftMotor;
     protected MotionMagicVoltage m_liftMotorMMV;
-    protected CANcoder m_liftEncoder;
+    // protected CANcoder m_liftEncoder;
     protected DigitalInput m_liftLimitSwitch;
 
     protected TalonFX m_rotateMotorLeft;
     protected MotionMagicVoltage m_rotateMotorLeftMMV;
     protected TalonFX m_rotateMotorRight;
     protected MotionMagicVoltage m_rotateMotorRightMMV;
-    // protected CANcoder m_rotateEncoder;
+    protected CANcoder m_rotateEncoder;
     protected DigitalInput m_rotateLimitSwitch;
 
     // protected ElevatorFeedforward m_feedforward;
@@ -64,22 +67,24 @@ public class Arm implements Subsystem {
 
     // private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
+    private final Intake m_intake;
     private final PS4Controller m_controller;
 
-    public Arm(PS4Controller controller){
+    public Arm(PS4Controller controller, Intake intake){
 
+        m_intake = intake;
         m_controller = controller;
 
         liftMotorInit();
-        liftEncoderInit();
+        // liftEncoderInit();
         m_liftLimitSwitch = new DigitalInput(0);
 
         //---------------------------------------------------------------------
+        rotateEncoderInit();
         rotateLeftMotorInit();
         rotateRightMotorInit();
         m_rotateMotorRight.setControl(new Follower(m_rotateMotorLeft.getDeviceID(), false));
 
-        // rotateEncoderInit();
         m_rotateLimitSwitch = new DigitalInput(1);
         //--------------------------------------------------------------------- 
 
@@ -95,17 +100,18 @@ public class Arm implements Subsystem {
 
         TalonFXConfiguration cfg = new TalonFXConfiguration();
         /* Configure current limits */
-        cfg.MotionMagic.MotionMagicCruiseVelocity = 5; // 5 rotations per second cruise
-        cfg.MotionMagic.MotionMagicAcceleration = 10; // Take approximately 0.5 seconds to reach max vel
+        cfg.MotionMagic.MotionMagicCruiseVelocity = 20; // 5 rotations per second cruise
+        cfg.MotionMagic.MotionMagicAcceleration = 40; // Take approximately 0.5 seconds to reach max vel
         cfg.MotionMagic.MotionMagicJerk = 50;   
 
-        cfg.Slot0.kP = 2F;
+
+        cfg.Slot0.kP = 4.0F;
         cfg.Slot0.kI = 0.0F;
         cfg.Slot0.kD = 0.0F;
         cfg.Slot0.kV = 0.0F;
-        cfg.Slot0.kS = 0.25F; // Approximately 0.25V to get the mechanism moving
+        cfg.Slot0.kS = 0.0F; // Approximately 0.25V to get the mechanism moving
 
-        cfg.Feedback.SensorToMechanismRatio = 2F;
+        // cfg.Feedback.SensorToMechanismRatio = 2F;
     
         // cfg.Voltage.PeakForwardVoltage = 3.2; //3.2V is 20% of 16V
         // cfg.Voltage.PeakForwardVoltage = -3.2; //3.2V is 20% of 16V
@@ -125,16 +131,15 @@ public class Arm implements Subsystem {
           System.out.println("Could not configure lift motor. Error: " + status.toString());
         }
 
-        // m_liftMotorMMV.OverrideBrakeDurNeutral = true;
-        // liftMotor.setNeutralMode(NeutralMode.Brake);
+        m_liftMotorMMV.OverrideBrakeDurNeutral = true;
         m_liftMotor.setRotorPosition(0);
         m_liftMotor.setVoltage(0);
     }
 
     private void rotateLeftMotorInit(){
         m_rotateMotorLeft = new TalonFX(Constants.Arm.ROTATEMOTORLEFT, "MANIPbus");
-        m_rotateMotorLeftMMV = new MotionMagicVoltage(0);
-        
+        m_rotateMotorLeftMMV = new MotionMagicVoltage(0); 
+  
         TalonFXConfiguration cfg = new TalonFXConfiguration();
         /* Configure current limits */
         cfg.MotionMagic.MotionMagicCruiseVelocity = 5; // 5 rotations per second cruise
@@ -147,7 +152,11 @@ public class Arm implements Subsystem {
         cfg.Slot0.kV = 0.0F;
         cfg.Slot0.kS = 0.25F; // Approximately 0.25V to get the mechanism moving
 
-        cfg.Feedback.SensorToMechanismRatio = 4.0F;
+        // tie CANcode on arm rotate shaft to the left motor
+        cfg.Feedback.FeedbackRemoteSensorID = m_rotateEncoder.getDeviceID();
+        cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        // cfg.Feedback.SensorToMechanismRatio = 1.0;
+        // cfg.Feedback.RotorToSensorRatio = 2;
 
         // cfg.Voltage.PeakForwardVoltage = 3.2; //3.2V is 20% of 16V
         // cfg.Voltage.PeakForwardVoltage = -3.2; //3.2V is 20% of 16V
@@ -185,7 +194,7 @@ public class Arm implements Subsystem {
         cfg.Slot0.kV = 0.0F;
         cfg.Slot0.kS = 0.25F; // Approximately 0.25V to get the mechanism moving
     
-        cfg.Feedback.SensorToMechanismRatio = 4.0F;
+        // cfg.Feedback.SensorToMechanismRatio = 2F;
         
         // cfg.Voltage.PeakForwardVoltage = 3.2; //3.2V is 20% of 16V
         // cfg.Voltage.PeakForwardVoltage = -3.2; //3.2V is 20% of 16V
@@ -207,57 +216,34 @@ public class Arm implements Subsystem {
         m_rotateMotorRight.setVoltage(0);
     }
 
-    private void liftEncoderInit(){
-        m_liftEncoder = new CANcoder(Constants.Arm.LIFTENCODER, "MANIPbus");
-
-        /* Configure CANcoder */
-        var cfg = new CANcoderConfiguration();
-
-        /* User can change the configs if they want, or leave it empty for factory-default */
-
-        m_liftEncoder.getConfigurator().apply(cfg);
-
-        /* Speed up signals to an appropriate rate */
-        m_liftEncoder.getPosition().setUpdateFrequency(100);
-        m_liftEncoder.getVelocity().setUpdateFrequency(100);
-    }
-
-    // private void rotateEncoderInit(){
-    //     m_rotateEncoder = new CANcoder(Constants.Arm.ROTATEENCODER, "MANIPbus");
+    // private void liftEncoderInit(){
+    //     m_liftEncoder = new CANcoder(Constants.Arm.LIFTENCODER, "MANIPbus");
 
     //     /* Configure CANcoder */
     //     var cfg = new CANcoderConfiguration();
 
     //     /* User can change the configs if they want, or leave it empty for factory-default */
 
-    //     m_rotateEncoder.getConfigurator().apply(cfg);
+    //     m_liftEncoder.getConfigurator().apply(cfg);
 
     //     /* Speed up signals to an appropriate rate */
-    //     m_rotateEncoder.getPosition().setUpdateFrequency(100);
-    //     m_rotateEncoder.getVelocity().setUpdateFrequency(100);
+    //     m_liftEncoder.getPosition().setUpdateFrequency(100);
+    //     m_liftEncoder.getVelocity().setUpdateFrequency(100);
     // }
-    
-    @Override
-    public void readPeriodicInputs(double timestamp) {
- 
-        // if(!m_liftLimitSwitch.get())
-        //     zeroLiftSensor();
 
-        // if(m_rotateLimitSwitch.get())
-        //     zeroRotateSensors();
+    private void rotateEncoderInit(){
+        m_rotateEncoder = new CANcoder(Constants.Arm.ROTATEENCODER, "MANIPbus");
 
-       if(m_controller.getCrossButtonPressed()){
-            setWantedState(SystemState.NEUTRAL);
-            System.out.println("cross pressed - Neutral state");
-        }
-       if(m_controller.getCircleButtonPressed()){
-            setWantedState(SystemState.GROUND_ANGLE);
-            System.out.println("circle pressed - ground angle state");
-        }
-        if(m_controller.getTriangleButtonPressed()){
-            setWantedState(SystemState.PLACING);
-            System.out.println("triangle pressed - placing state");
-        }  
+        /* Configure CANcoder to zero the magnet appropriately */
+        CANcoderConfiguration cc_cfg = new CANcoderConfiguration();
+        cc_cfg.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        cc_cfg.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        cc_cfg.MagnetSensor.MagnetOffset = 0.4;
+        m_rotateEncoder.getConfigurator().apply(cc_cfg);
+
+        /* Speed up signals to an appropriate rate */
+        m_rotateEncoder.getPosition().setUpdateFrequency(100);
+        m_rotateEncoder.getVelocity().setUpdateFrequency(100);
     }
 
     @Override
@@ -275,7 +261,10 @@ public class Arm implements Subsystem {
              case HUMAN_FOLD:
                  newState = handleManual();
                  break;
-             case PLACING:
+             case MID:
+                 newState = handleManual();
+                 break;
+             case HIGH:
                  newState = handleManual();
                  break;
          }
@@ -286,35 +275,77 @@ public class Arm implements Subsystem {
     }
 
     @Override
+    public void readPeriodicInputs(double timestamp) {
+ 
+        // if(!m_liftLimitSwitch.get())
+        //     zeroLiftSensor();
+
+        // if(m_rotateLimitSwitch.get())
+        //     zeroRotateSensors();
+
+		if(m_intake.getIntakeCurrent()>=200 && m_intake.getCurrentState() != frc.robot.subsystems.Intake.SystemState.PLACING && m_intake.getCurrentState() != frc.robot.subsystems.Intake.SystemState.IDLE){
+            setWantedState(SystemState.NEUTRAL);
+            System.out.println("Intake current threshold hit - Neutral state");
+        }
+        if(m_controller.getCrossButtonPressed()){
+            setWantedState(SystemState.GROUND_ANGLE);
+            System.out.println("cross pressed - ground angle state");
+        }
+        if(m_controller.getCrossButtonReleased()){
+            setWantedState(SystemState.NEUTRAL);
+            System.out.println("cross released - Neutral state");
+        }
+        if(m_controller.getCircleButtonPressed()){
+            setWantedState(SystemState.MID);
+            System.out.println("cross pressed - Mid state");
+        }
+        if(m_controller.getTriangleButtonPressed()){
+            setWantedState(SystemState.NEUTRAL);
+            System.out.println("cross pressed - Neutral state");
+        }
+        if(m_controller.getSquareButtonPressed()){
+            setWantedState(SystemState.HIGH);
+            System.out.println("cross pressed - High state");
+        }
+    }
+    
+    @Override
     public void writePeriodicOutputs(double timestamp)
     {
         switch (m_currentState){
             case GROUND_ANGLE:
-                configRotate(-6.0); //target -75200
+				//configRotate(-83000);
+                //configExtend(0);
+
+                configRotate(-20.0);
+				configLift(0);
                 break;
-            //case HUMAN_FOLD:
-              //  configRotate(-100000);
-              //  break;
-             case PLACING:
-                // configRotate(-50000);
-                configLift(5.5);
+             case MID:
+                //configRotate(-40478);
+                //configExtend(58652);
+
+				configRotate(-10.0);
+                configLift(20.0);
+                break;
+             case HIGH:
+                //configRotate(-40478);
+                //configExtend(70000);
+
+			 	configRotate(-10.0);
+				configLift(16.0);
                 break;
             default:
             case NEUTRAL:
                 configRotate(0);
                 configLift(0);
                 break;
-            //case HIGH:
-                //TODO: put something here
-               // break;
-           // case MID:
-                // MID
-                //break;
+
         }
     }
 
     @Override
     public void stop() {
+        
     }
 
     @Override
@@ -328,22 +359,10 @@ public class Arm implements Subsystem {
         SmartDashboard.putString("Lift Pos", m_liftMotor.getPosition().toString());
         SmartDashboard.putString("Rotate Left Pos", m_rotateMotorLeft.getPosition().toString());
         SmartDashboard.putString("Rotate Right Pos", m_rotateMotorLeft.getPosition().toString());
-        SmartDashboard.putString("Lift Encoder Pos", m_liftEncoder.getPosition().toString());
-        // SmartDashboard.putString("Rotate Encoder Pos", m_rotateEncoder.getPosition().toString());
+        // SmartDashboard.putString("Lift Encoder Pos", m_liftEncoder.getPosition().toString());
+        SmartDashboard.putString("Rotate Encoder Pos", m_rotateEncoder.getPosition().toString());
     }
 
-        
-    @Override
-    public boolean checkSystem() {
-        return false;
-    }
-    
-    @Override
-    public String getId() {
-        return null;
-    }
-
-    //-------------------------------------------------------------------------
     private SystemState handleManual(){
         return m_wantedState;
     }
@@ -355,42 +374,38 @@ public class Arm implements Subsystem {
     public void configLift(double position){
         m_liftMotor.setControl(m_liftMotorMMV.withPosition(position));
         // m_liftMotor.setRotorPosition(position);
-        //below is from Phoenix v5
-        // liftMotor.set(ControlMode.Position, position);
     }
    
     public void configRotate(double position){
         m_rotateMotorLeft.setControl(m_rotateMotorLeftMMV.withPosition(position));
-        //m_rotateMotorLeft.setRotorPosition(position);
-        //TODO:  not sure right needs to be set if it is a follower already
-        //m_rotateMotorRight.setControl(m_rotateMotorRightMMV.withPosition(position));
-        //m_rotateMotorRight.setRotorPosition(position);
-
-        //below is from Phoenix v5
-        // rotateMotorLeft.set(ControlMode.Position, pos);
-        // rotateMotorRight.set(ControlMode.Position, pos);
     }
-
+    
+    @Override
+    public boolean checkSystem() {
+        return false;
+    }
 
     @Override
     public void zeroSensors() {
-        zeroLiftSensor();
+        // zeroLiftSensor();
         zeroRotateSensors();
+		// m_armEncoder.setPosition(0);
+		m_rotateEncoder.setPosition(0);
     }
    
     public void zeroLiftSensor(){
         m_liftMotor.setControl(m_liftMotorMMV.withPosition(0));
-        //below is from Phoenix v5
-        // liftMotor.setSelectedSensorPosition(0);
     }
     public void zeroRotateSensors(){
         m_rotateMotorLeft.setControl(m_rotateMotorLeftMMV.withPosition(0));
-        // m_rotateMotorRight.setControl(m_rotateMotorRightMMV.withPosition(0));
-        //below is from Phoenix v5
-        // rotateMotorLeft.setSelectedSensorPosition(0);
-        // rotateMotorRight.setSelectedSensorPosition(0);
     }
 
+    
+
+    @Override
+    public String getId() {
+        return null;
+    }
 
     // private float ensureRange(float value, float min, float max) {
     //     return Math.min(Math.max(value, min), max);
