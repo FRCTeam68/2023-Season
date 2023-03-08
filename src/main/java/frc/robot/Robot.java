@@ -32,7 +32,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     m_robotContainer.startSubsystemThreads();
-    Autons.checkPath();
+    
   }
 
   @Override
@@ -45,11 +45,11 @@ public class Robot extends TimedRobot {
     
     autonomousCommand = Autons.test(m_robotContainer.drivetrain);
 
-    /* 
+    
     if (autonomousCommand != null) {
 			autonomousCommand.schedule();
 		}
-    */
+    
   }
 
   @Override
