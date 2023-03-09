@@ -182,7 +182,10 @@ public class Drivetrain implements Subsystem {
         periodicIO.goalVx = chassisVelocity[2];
         periodicIO.goalVy = chassisVelocity[3];
 
-        wantedState = (controller.getAButtonPressed()) ? WantedState.AUTO_BALANCE : WantedState.MANUAL_CONTROL;
+        if(controller.getAButtonPressed())
+            setWantedState(WantedState.AUTO_BALANCE);
+        if(controller.getAButtonReleased())
+            setWantedState(WantedState.MANUAL_CONTROL);
 
     }
 
@@ -198,9 +201,11 @@ public class Drivetrain implements Subsystem {
                 break;
             case AUTO_BALANCE:
                 moduleStates = autoBalance();
+                //System.out.println("IN balance");
                 break;
             case MANUAL_CONTROL:
                 moduleStates = drive(periodicIO.VxCmd, periodicIO.VyCmd, -controller.getRightX()*.5, !periodicIO.robotOrientedModifier);
+                //System.out.println("IN manual");
                 break;
             default:
             case IDLE:
@@ -208,6 +213,7 @@ public class Drivetrain implements Subsystem {
                 break;
 
         }
+        
         setModuleStates(moduleStates);
         updateStateVariables(moduleStates);
     }
@@ -223,7 +229,7 @@ public class Drivetrain implements Subsystem {
         double currentAngle = getPitch();
 
         double error = Constants.BEAM_BALANCED_GOAL_DEGREES - currentAngle;
-        double drivePower = -Math.min(Constants.BEAM_BALANACED_DRIVE_KP * error, 1);
+        double drivePower = -Math.min(Constants.BEAM_BALANACED_DRIVE_KP * error, 1)*.4;
 
         // Our robot needed an extra push to drive up in reverse, probably due to weight imbalances
         if (drivePower < 0) {
@@ -235,7 +241,16 @@ public class Drivetrain implements Subsystem {
         drivePower = Math.copySign(0.4, drivePower);
         }
 
+<<<<<<< HEAD
         return drive(drivePower, 0, 0.0, false);
+=======
+    System.out.println("Current Angle: " + currentAngle);
+    System.out.println("Error " + error);
+    System.out.println("Drive Power: " + drivePower);
+
+        return drive(drivePower, 0.0, 0.0, true);
+ 
+>>>>>>> 0d60a84e7845848b56a33ee76247feea2dd045c3
         
     }
 
@@ -316,6 +331,8 @@ public class Drivetrain implements Subsystem {
         SmartDashboard.putNumber("drivetrain/goalVx", periodicIO.goalVx);
         SmartDashboard.putNumber("drivetrain/goalVy", periodicIO.goalVy);
         */
+        
+
         for(SwerveModule mod : mSwerveMods){
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
@@ -422,6 +439,7 @@ public class Drivetrain implements Subsystem {
         SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(states[mod.moduleNumber], true);
+            //System.out.println("Xspeed"+xSpeed);
         }
         return states;
     }
