@@ -45,7 +45,7 @@ Command fullAuto = autoBuilder.fullAuto(straightLine);
     return new SequentialCommandGroup(
     new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
     fullAuto.alongWith(new WaitCommand(20)),
-    new InstantCommand(() -> driveTrain.setWantedState(Drivetrain.WantedState.IDLE))
+    new InstantCommand(() -> driveTrain.setWantedState(Drivetrain.WantedState.MANUAL_CONTROL))
     );
 }
 
