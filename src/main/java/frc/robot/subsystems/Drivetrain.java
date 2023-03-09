@@ -235,8 +235,7 @@ public class Drivetrain implements Subsystem {
         drivePower = Math.copySign(0.4, drivePower);
         }
 
-        return drive(0.0, drivePower, 0.0, false);
- 
+        return drive(drivePower, 0, 0.0, false);
         
     }
 
