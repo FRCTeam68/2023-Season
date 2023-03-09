@@ -14,6 +14,10 @@ import frc.robot.utils.CrashTrackingRunnable;
 
 public class SubsystemManager {
 
+	/*
+	 * FROM TEAM 27 RUSH 
+	 */
+
 	private final ForkJoinPool threadPool = new ForkJoinPool(3);
 	private List<Subsystem> subsystems = new ArrayList<>();
 	public final double period;

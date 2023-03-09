@@ -45,11 +45,11 @@ public class Robot extends TimedRobot {
     
     autonomousCommand = Autons.test(m_robotContainer.drivetrain);
 
-    /* 
+    
     if (autonomousCommand != null) {
 			autonomousCommand.schedule();
 		}
-    */
+    
   }
 
   @Override
