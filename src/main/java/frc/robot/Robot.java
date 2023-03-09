@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_robotContainer.enableState = RobotContainer.EnableState.AUTON;
     
-    autonomousCommand = Autons.curveTest(m_robotContainer.drivetrain);
+    autonomousCommand = Autons.test(m_robotContainer.drivetrain);
 
     
     if (autonomousCommand != null) {
