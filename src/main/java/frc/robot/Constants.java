@@ -13,6 +13,12 @@ import frc.robot.utils.SwerveModuleConstants;
 public final class Constants {
     public static final double stickDeadband = 0.1;
 
+    // Random stuff I dont feel like doing because maem
+    public static final double BEAM_BALANACED_DRIVE_KP = 0.015; // P (Proportional) constant of a PID loop
+    public static final double BEAM_BALANCED_GOAL_DEGREES = 0;
+    public static final double BEAM_BALANCED_ANGLE_TRESHOLD_DEGREES = 1;
+    public static final double BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER = 1.35;
+
     public static final class Swerve {
        
         public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-

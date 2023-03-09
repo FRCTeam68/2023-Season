@@ -408,6 +408,12 @@ public class Drivetrain implements Subsystem {
           return Rotation2d.fromDegrees(360.0 - ahrs.getYaw());
     }
 
+    public double getPitch() {
+       //
+       //    // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
+          return ahrs.getPitch();
+    }
+
     @Override
     public boolean checkSystem() {
         // TODO Auto-generated method stub

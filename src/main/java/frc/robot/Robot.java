@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
 
   public static CTREConfigs ctreConfigs;
 
-  private RobotContainer m_robotContainer;
+  public RobotContainer m_robotContainer;
 
 
   @Override
