@@ -1,12 +1,8 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SPI;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,14 +11,13 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
-import frc.robot.Constants.*;
 import frc.robot.utils.maths.oneDimensionalLookup;
 
 public class Drivetrain implements Subsystem {
@@ -58,13 +53,15 @@ public class Drivetrain implements Subsystem {
     private enum SystemState{
         IDLE,   
         MANUAL_CONTROL,
-        TRAJECTORY_FOLLOWING           //X,Y axis speeds relative to field
+        TRAJECTORY_FOLLOWING,           //X,Y axis speeds relative to field
+        AUTO_BALANCE
     }
 
     public enum WantedState{
         IDLE,
         MANUAL_CONTROL,
-        TRAJECTORY_FOLLOWING
+        TRAJECTORY_FOLLOWING,
+        AUTO_BALANCE
     }
 
     private static class PeriodicIO {
@@ -149,6 +146,9 @@ public class Drivetrain implements Subsystem {
         SystemState newState;
         switch (currentState){
             default:
+            case AUTO_BALANCE:
+                newState = handleManualControl();
+                break;
             case MANUAL_CONTROL:
                 newState = handleManualControl();
                 break;
@@ -182,6 +182,8 @@ public class Drivetrain implements Subsystem {
         periodicIO.goalVx = chassisVelocity[2];
         periodicIO.goalVy = chassisVelocity[3];
 
+        wantedState = (controller.getAButtonPressed()) ? WantedState.AUTO_BALANCE : WantedState.MANUAL_CONTROL;
+
     }
 
     
@@ -193,6 +195,9 @@ public class Drivetrain implements Subsystem {
         switch(currentState){
             case TRAJECTORY_FOLLOWING:
                 moduleStates = trajectoryStates;
+                break;
+            case AUTO_BALANCE:
+                moduleStates = autoBalance();
                 break;
             case MANUAL_CONTROL:
                 moduleStates = drive(periodicIO.VxCmd, periodicIO.VyCmd, -controller.getRightX()*.5, !periodicIO.robotOrientedModifier);
@@ -212,8 +217,33 @@ public class Drivetrain implements Subsystem {
         
     }
 
+    private SwerveModuleState[] autoBalance(){
+        // Uncomment the line below this to simulate the gyroscope axis with a controller joystick
+        // Double currentAngle = -1 * Robot.controller.getRawAxis(Constants.LEFT_VERTICAL_JOYSTICK_AXIS) * 45;
+        double currentAngle = getPitch();
+
+        double error = Constants.BEAM_BALANCED_GOAL_DEGREES - currentAngle;
+        double drivePower = -Math.min(Constants.BEAM_BALANACED_DRIVE_KP * error, 1);
+
+        // Our robot needed an extra push to drive up in reverse, probably due to weight imbalances
+        if (drivePower < 0) {
+        drivePower *= Constants.BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER;
+        }
+
+        // Limit the max power
+        if (Math.abs(drivePower) > 0.4) {
+        drivePower = Math.copySign(0.4, drivePower);
+        }
+
+        return drive(0.0, drivePower, 0.0, false);
+ 
+        
+    }
+
     private SystemState defaultStateChange() {
 		switch (wantedState){
+            case AUTO_BALANCE:
+                return SystemState.AUTO_BALANCE;
             /*case IDLE:
                 return SystemState.IDLE;*/
             case TRAJECTORY_FOLLOWING:
