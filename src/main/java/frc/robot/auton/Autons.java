@@ -47,9 +47,4 @@ Command fullAuto = autoBuilder.fullAuto(straightLine);
     fullAuto.alongWith(new WaitCommand(3))
     );
 }
-public static void checkPath(){
-    long load_start = System.currentTimeMillis();
-    System.out.println(String.format("Path: [%s] to %d milliseconds.","lineTest",System.currentTimeMillis()-load_start));
-}
-
 }

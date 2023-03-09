@@ -22,10 +22,10 @@ public class PathPlannerCommand extends PPSwerveControllerCommand {
   private final boolean resetOdometry;
 
     //TODO: relocate to constants file
-    private static final double translateKp = 5.5;
+    private static final double translateKp = 3;
     private static final double translateKi = 0;
     private static final double translateKd = 0;
-    private static final double rotateKp = 4;
+    private static final double rotateKp = .6;
     private static final double rotateKi = 0;
     private static final double rotateKd = 0;
 
