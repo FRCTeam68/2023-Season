@@ -184,6 +184,8 @@ public class Arm implements Subsystem {
 
         TalonFXConfiguration cfg = new TalonFXConfiguration();
         /* Configure current limits */
+        cfg.CurrentLimits.SupplyCurrentLimit = 30.0;
+        cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
         cfg.MotionMagic.MotionMagicCruiseVelocity = 5; // 5 rotations per second cruise
         cfg.MotionMagic.MotionMagicAcceleration = 10; // Take approximately 0.5 seconds to reach max vel
         cfg.MotionMagic.MotionMagicJerk = 50;   
