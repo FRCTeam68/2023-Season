@@ -19,7 +19,6 @@ public final class Constants {
     public static final double BALANCEDMAXSPEED = 3;
     public static final double BALANCED_OFFESET = 2.3;
 
-
     public static final class Swerve {
        
         public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
@@ -92,7 +91,7 @@ public final class Constants {
         public static final double maxAngularVelocity = 10.0; //TODO: This must be tuned to specific robot
 
         /* Neutral Modes */
-        public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
+        public static final NeutralMode angleNeutralMode = NeutralMode.Brake;
         public static final NeutralMode driveNeutralMode = NeutralMode.Brake;
 
         /* Module Specific Constants */
@@ -101,7 +100,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 15;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(293.20);   // 321.4160-180 //141.152
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(111.71+180); //293.20);   // 321.4160-180 //141.152
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -111,7 +110,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 16;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(145.68);  //290.7422-180 //71.455
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(326.60-180);  //145.68);  //290.7422-180 //71.455
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -121,7 +120,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 17;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(257.50);  //18.3691+180 //295.576
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(65.10+180);  //257.50);  //18.3691+180 //295.576
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -131,7 +130,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 18;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(320.80);  //53.8767+16.3146 //65.039
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(141.60+180);  //320.80);  //53.8767+16.3146 //65.039
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -178,7 +177,7 @@ public final class Constants {
         );
 
         public static final int MAX_FWD_REV_SPEED_MPS_EST = 10;
-        public static final int MAX_ROTATE_SPEED_RAD_PER_SEC_EST = 5;
+        public static final int MAX_ROTATE_SPEED_RAD_PER_SEC_EST = 10;
         static public final double MAX_FWD_REV_SPEED_FAST = 0.5; // Percent of output power
         static public final double MAX_STRAFE_SPEED_FAST = 0.5;
         static public final double MAX_ROTATE_SPEED_FAST = 0.35;
@@ -194,19 +193,16 @@ public final class Constants {
     }
 
     public class ARM {
-        public static final int MOTOROFFSET = 4000;
         public static final int EXTENDMOTOR = 13;
-        public static final int ROTATEMOTOR1 = 11;
-        public static final int ROTATEMOTOR2 = 12;
-        public static final int EXTENDENCODER = 0;
-        public static final int ROTATEENCODER = 0;
+		public static final int ROTATEMOTOR = 12;
+        public static final int EXTENDENCODER = 20;
+        public static final int ROTATEENCODER = 21;
 
-        public static final float MAXEXTENDOSPEED = 0.2F;
-
-        public static final float MAXROTATOSPEED = 0.2F;
-        public static final int ROTATE_DEADRANGE = 0;
+        public static final double MAX_MANUAL_SUPPLY_VOLTAGE = 11.0;
     }
     public final static class INTAKE {
         public static final int INTAKE_MOTOR = 14;
+
+        public static final double MAX_SUPPLY_VOLTAGE = 11.0;
     }
 }
