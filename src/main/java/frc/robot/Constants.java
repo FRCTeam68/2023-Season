@@ -193,12 +193,17 @@ public final class Constants {
     }
 
     public class ARM {
+        public static final int MOTOROFFSET = 4000;
         public static final int EXTENDMOTOR = 13;
-		public static final int ROTATEMOTOR = 12;
-        public static final int EXTENDENCODER = 20;
-        public static final int ROTATEENCODER = 21;
+        public static final int ROTATEMOTOR1 = 11;
+        public static final int ROTATEMOTOR2 = 12;
+        public static final int EXTENDENCODER = 0;
+        public static final int ROTATEENCODER = 0;
 
-        public static final double MAX_MANUAL_SUPPLY_VOLTAGE = 11.0;
+        public static final float MAXEXTENDOSPEED = 0.2F;
+
+        public static final float MAXROTATOSPEED = 0.2F;
+        public static final int ROTATE_DEADRANGE = 0;
     }
     public final static class INTAKE {
         public static final int INTAKE_MOTOR = 14;
