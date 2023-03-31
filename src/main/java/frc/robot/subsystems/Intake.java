@@ -4,6 +4,13 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import com.ctre.phoenixpro.StatusCode;
+import com.ctre.phoenixpro.configs.TalonFXConfiguration;
+import com.ctre.phoenixpro.controls.MotionMagicVoltage;
+import com.ctre.phoenixpro.controls.VelocityVoltage;
+import com.ctre.phoenixpro.controls.VoltageOut;
+//import com.ctre.phoenixpro.hardware.TalonFX;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,20 +30,12 @@ public class Intake implements Subsystem {
         PLACING
     }
 
-    public enum WantedState{
-        IDLE,
-        INTAKING_CONE,
-        INTAKING_CUBE,
-        IDLE_CUBE,
-        PLACING
-    }
-
     private SystemState currentState = SystemState.IDLE;
-    private WantedState wantedState = WantedState.IDLE;
+    private SystemState wantedState = SystemState.IDLE;
     
 
-    private boolean haveCube;
-    private boolean haveCone;
+    public boolean haveCube;
+    public boolean haveCone;
 
     private double currentStateStartTime = 0;
 
@@ -89,39 +88,31 @@ public class Intake implements Subsystem {
 
     @Override
     public void readPeriodicInputs(double timestamp){
-        if (controller.getL1ButtonPressed())
-            wantedState =  WantedState.INTAKING_CONE;
-        if (controller.getL1ButtonReleased())
-            wantedState = WantedState.IDLE;
+        // if (controller.getL1ButtonPressed())
+        //     setWantedState(SystemState.INTAKING_CONE);
+        // if (controller.getL1ButtonReleased())
+        //     setWantedState(SystemState.IDLE);
 
-        if (controller.getL2ButtonPressed())
-            wantedState = WantedState.INTAKING_CUBE;
-        if (controller.getL2ButtonReleased())
-            wantedState = WantedState.IDLE;
+        // if (controller.getL2ButtonPressed())
+        //     setWantedState(SystemState.INTAKING_CUBE);
+        // if (controller.getL2ButtonReleased())
+        //     setWantedState(SystemState.IDLE);
 
         if (currentState == SystemState.INTAKING_CONE && getIntakeCurrent() > 200){
-            new SequentialCommandGroup(
-                new WaitCommand(5),
-                new InstantCommand(()-> setWantedState(WantedState.IDLE))
-            );
             haveCone = true;
         }
         if (currentState == SystemState.INTAKING_CUBE && getIntakeCurrent() > 100){
-            new SequentialCommandGroup(
-                new WaitCommand(5),
-                new InstantCommand(()-> setWantedState(WantedState.IDLE_CUBE))
-            );
             haveCube = true;
         }
      
         if (controller.getR2ButtonPressed()){
-            wantedState = WantedState.PLACING;
+            setWantedState(SystemState.PLACING);
             haveCone = false;
             haveCube = false;
         }
             
         if (controller.getR2ButtonReleased())
-            wantedState = WantedState.IDLE;
+            setWantedState(SystemState.IDLE);
 
 
     }
@@ -151,19 +142,13 @@ public class Intake implements Subsystem {
 
 
     private SystemState handleManual(){
-        switch (wantedState){
-            case INTAKING_CONE:
-                return SystemState.INTAKING_CONE;
-            case INTAKING_CUBE:
-                return SystemState.INTAKING_CUBE;
-            case PLACING:
-                return SystemState.PLACING;
-            case IDLE_CUBE:
-                return SystemState.IDLE_CUBE;
-            default:
-            case IDLE:
-                return SystemState.IDLE;
-		}
+        return wantedState;
+    }
+    public void setWantedState(SystemState wantedState) {
+		this.wantedState = wantedState;
+	}
+    public SystemState getCurrState(){
+        return currentState;
     }
 
     public void setIntakeSpeed(double speed){
@@ -203,9 +188,6 @@ public class Intake implements Subsystem {
         return "Intake";
     }
 
-    public void setWantedState(WantedState wantedState) {
-		this.wantedState = wantedState;
-	}
 
     public SystemState getCurrentState(){
         return currentState;

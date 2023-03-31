@@ -202,7 +202,7 @@ public final class Constants {
     }
     public final static class INTAKE {
         public static final int INTAKE_MOTOR = 14;
-
+        public static final int WRIST_MOTOR = 15;
         public static final double MAX_SUPPLY_VOLTAGE = 11.0;
     }
 }

@@ -6,9 +6,9 @@ import frc.robot.subsystems.Intake;
 public class IntakeWantedStateCommand extends InstantCommand {
     
     private final Intake intake;
-    private final Intake.WantedState wantedState;
+    private final Intake.SystemState wantedState;
 
-    public IntakeWantedStateCommand(final Intake intake, Intake.WantedState wantedState){
+    public IntakeWantedStateCommand(final Intake intake, Intake.SystemState wantedState){
         this.intake = intake;
         this.wantedState = wantedState;
     }

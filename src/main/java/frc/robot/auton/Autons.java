@@ -44,16 +44,16 @@ public class Autons {
     
         return new SequentialCommandGroup(
                 new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
-                new ArmWantedStateCommand(arm,SystemState.AUTON_HIGH),
+                new ArmWantedStateCommand(arm,SystemState.AUTON_CONE_HIGH),
                 new WaitCommand(1.7),
-                new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.PLACING),
+                new IntakeWantedStateCommand(intake, Intake.SystemState.PLACING),
                 new WaitCommand(1),
-                new ParallelCommandGroup(new ArmWantedStateCommand(arm, SystemState.NEUTRAL), new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.IDLE)),
+                new ParallelCommandGroup(new ArmWantedStateCommand(arm, SystemState.NEUTRAL), new IntakeWantedStateCommand(intake, Intake.SystemState.IDLE)),
                 new WaitCommand(1),
                 new InstantCommand(()-> driveTrain.setWantedState(Drivetrain.WantedState.TRAJECTORY_FOLLOWING)),
                 fullAuto[0],
                 fullAuto[1],
-                new ParallelCommandGroup(fullAuto[2], new ArmWantedStateCommand(arm, SystemState.GROUND_ANGLE), new IntakeWantedStateCommand(intake, Intake.WantedState.INTAKING_CUBE)),
+                new ParallelCommandGroup(fullAuto[2], new ArmWantedStateCommand(arm, SystemState.GROUND_CUBE_ANGLE), new IntakeWantedStateCommand(intake, Intake.SystemState.INTAKING_CUBE)),
                 new ParallelCommandGroup(fullAuto[3], new ArmWantedStateCommand(arm, SystemState.NEUTRAL)),
                 new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
                 new InstantCommand(() -> driveTrain.setWantedState(Drivetrain.WantedState.AUTO_BALANCE))
@@ -72,20 +72,20 @@ public class Autons {
             
         return new SequentialCommandGroup(
                 new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
-                new ArmWantedStateCommand(arm,SystemState.AUTON_HIGH),
+                new ArmWantedStateCommand(arm,SystemState.AUTON_CONE_HIGH),
                 new WaitCommand(1.2),
-                new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.PLACING),
+                new IntakeWantedStateCommand(intake, Intake.SystemState.PLACING),
                 new WaitCommand(1),
                 new ArmWantedStateCommand(arm, SystemState.NEUTRAL),
                 new WaitCommand(1),
                 new InstantCommand(()-> driveTrain.setWantedState(Drivetrain.WantedState.TRAJECTORY_FOLLOWING)),
-                new ParallelCommandGroup(fullAuto[0], new SequentialCommandGroup(new ArmWantedStateCommand(arm, SystemState.GROUND_ANGLE),new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.INTAKING_CUBE),new WaitCommand(3.5),new ArmWantedStateCommand(arm, SystemState.NEUTRAL))),
+                new ParallelCommandGroup(fullAuto[0], new SequentialCommandGroup(new ArmWantedStateCommand(arm, SystemState.GROUND_CUBE_ANGLE),new IntakeWantedStateCommand(intake, Intake.SystemState.INTAKING_CUBE),new WaitCommand(3.5),new ArmWantedStateCommand(arm, SystemState.NEUTRAL))),
                 fullAuto[1],
-                new ArmWantedStateCommand(arm, SystemState.AUTON_HIGH),
+                new ArmWantedStateCommand(arm, SystemState.AUTON_CUBE_HIGH),
                 new WaitCommand(1),
-                new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.PLACING),
+                new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.SystemState.PLACING),
                 new WaitCommand(1),
-                new ParallelCommandGroup(new ArmWantedStateCommand(arm, SystemState.NEUTRAL), new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.IDLE)),
+                new ParallelCommandGroup(new ArmWantedStateCommand(arm, SystemState.NEUTRAL), new IntakeWantedStateCommand(intake, Intake.SystemState.IDLE)),
                 fullAuto[2]
                 // new ArmWantedStateCommand(arm, SystemState.GROUND_ANGLE)
             );
@@ -99,20 +99,20 @@ public class Autons {
             
         return new SequentialCommandGroup(
                 new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
-                new ArmWantedStateCommand(arm,SystemState.AUTON_HIGH),
+                new ArmWantedStateCommand(arm,SystemState.AUTON_CONE_HIGH),
                 new WaitCommand(1.2),
-                new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.PLACING),
+                new IntakeWantedStateCommand(intake, Intake.SystemState.PLACING),
                 new WaitCommand(1),
                 new ArmWantedStateCommand(arm, SystemState.NEUTRAL),
                 new WaitCommand(1),
                 new InstantCommand(()-> driveTrain.setWantedState(Drivetrain.WantedState.TRAJECTORY_FOLLOWING)),
-                new ParallelCommandGroup(fullAuto[0], new SequentialCommandGroup(new ArmWantedStateCommand(arm, SystemState.GROUND_ANGLE),new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.INTAKING_CUBE),new WaitCommand(3.5),new ArmWantedStateCommand(arm, SystemState.NEUTRAL))),
+                new ParallelCommandGroup(fullAuto[0], new SequentialCommandGroup(new ArmWantedStateCommand(arm, SystemState.GROUND_CUBE_ANGLE),new IntakeWantedStateCommand(intake, Intake.SystemState.INTAKING_CUBE),new WaitCommand(3.5),new ArmWantedStateCommand(arm, SystemState.NEUTRAL))),
                 fullAuto[1],
-                new ArmWantedStateCommand(arm, SystemState.AUTON_HIGH),
+                new ArmWantedStateCommand(arm, SystemState.AUTON_CUBE_HIGH),
                 new WaitCommand(1),
-                new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.PLACING),
+                new IntakeWantedStateCommand(intake, Intake.SystemState.PLACING),
                 new WaitCommand(1),
-                new ParallelCommandGroup(new ArmWantedStateCommand(arm, SystemState.NEUTRAL), new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.IDLE)),
+                new ParallelCommandGroup(new ArmWantedStateCommand(arm, SystemState.NEUTRAL), new IntakeWantedStateCommand(intake, Intake.SystemState.IDLE)),
                 fullAuto[2]
                 // new ArmWantedStateCommand(arm, SystemState.GROUND_ANGLE)
             );
@@ -125,11 +125,11 @@ public class Autons {
             
         return new SequentialCommandGroup(
             new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
-            new ArmWantedStateCommand(arm,SystemState.AUTON_HIGH),
+            new ArmWantedStateCommand(arm,SystemState.AUTON_CONE_HIGH),
             new WaitCommand(1.2),
-            new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.PLACING),
+            new IntakeWantedStateCommand(intake, Intake.SystemState.PLACING),
             new WaitCommand(1),
-            new ParallelCommandGroup(new ArmWantedStateCommand(arm, SystemState.NEUTRAL), new IntakeWantedStateCommand(intake, frc.robot.subsystems.Intake.WantedState.IDLE)),
+            new ParallelCommandGroup(new ArmWantedStateCommand(arm, SystemState.NEUTRAL), new IntakeWantedStateCommand(intake, Intake.SystemState.IDLE)),
             new WaitCommand(1),
             fullAuto[0]
             );

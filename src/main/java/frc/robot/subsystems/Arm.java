@@ -30,16 +30,22 @@ public class Arm implements Subsystem {
 
     public enum SystemState{
         NEUTRAL,
-        GROUND_ANGLE,
-        HUMAN_FOLD,
-        ZERO,
-        PLACING,
-        HIGH,
-        MID,
-        TRAVEL,
-        AUTON_MID,
-        AUTON_HIGH,
-        TRANSITION,
+        GROUND_CONE_ANGLE,
+        GROUND_CUBE_ANGLE,
+        HUMAN_FEED_CONE,
+        HUMAN_FEED_CUBE,
+        RAMP_FEED_CONE,
+        RAMP_FEED_CUBE,
+        CONE_HIGH,
+        CONE_MID,
+        CUBE_HIGH,
+        CUBE_MID,
+        AUTON_CONE_MID,
+        AUTON_CONE_HIGH,
+        AUTON_CUBE_MID,
+        AUTON_CUBE_HIGH,
+        CONE_TRANSITION,
+        CUBE_TRANSITION,
         MANUAL
     }
 
@@ -60,6 +66,9 @@ public class Arm implements Subsystem {
     protected double m_rotate_angle;
     protected double m_rotate_rotations;
 
+    protected TalonFX wristMotor;
+    protected MotionMagicVoltage wristMotorMMV;
+
 
     private final Intake m_intake;
     private final PS4Controller m_controller;
@@ -79,6 +88,8 @@ public class Arm implements Subsystem {
         // rotateEncoderInit();
         rotateMotorInit();
 		m_rotateLimitSwitch = new DigitalInput(0);
+
+        wristMotorInit();
 
     }
 
@@ -181,38 +192,39 @@ public class Arm implements Subsystem {
         zeroRotateSensor(); 
     }
 
-    // private void extendEncoderInit(){
-    //     m_extendEncoder = new CANcoder(Constants.ARM.EXTENDENCODER, "MANIPbus");
+    private void wristMotorInit(){
+        wristMotor = new TalonFX(Constants.INTAKE.WRIST_MOTOR, "MANIPbus");
+        wristMotorMMV = new MotionMagicVoltage(0);
 
-    //     /* Configure CANcoder */
-    //     var cfg = new CANcoderConfiguration();
+        TalonFXConfiguration cfg = new TalonFXConfiguration();
 
-    //     /* User can change the configs if they want, or leave it empty for factory-default */
+        cfg.MotionMagic.MotionMagicCruiseVelocity = 5;
+        cfg.MotionMagic.MotionMagicAcceleration = 2;
 
-    //     m_extendEncoder.getConfigurator().apply(cfg);
+        cfg.Slot0.kP = 55.0F;
+        cfg.Slot0.kI = 0.0F;
+        cfg.Slot0.kD = 0.0F;
+        cfg.Slot0.kV = 0.0F;
+        cfg.Slot0.kS = 0.25F;
 
-    //     /* Speed up signals to an appropriate rate */
-    //     m_extendEncoder.getPosition().setUpdateFrequency(100);
-    //     m_extendEncoder.getVelocity().setUpdateFrequency(100);
-    // }
+        cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
+        cfg.CurrentLimits.SupplyCurrentLimit = 30.0;
 
-    // private void rotateEncoderInit(){
-    //     m_rotateEncoder = new CANcoder(Constants.ARM.ROTATEENCODER, "MANIPbus");
+        StatusCode status = StatusCode.StatusCodeNotInitialized;
+        for(int i = 0; i < 5; ++i) {
+          status = wristMotor.getConfigurator().apply(cfg);
+          if (status.isOK()) break;
+        }
+        if (!status.isOK()) {
+          System.out.println("Could not configure rotate motor. Error: " + status.toString());
+        }
 
-    //     /* Configure CANcoder to zero the magnet appropriately */
-    //     CANcoderConfiguration cc_cfg = new CANcoderConfiguration();
-    
-    //     // cc_cfg.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
-    //     cc_cfg.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-    //     // cc_cfg.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-    //     cc_cfg.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-    //     // cc_cfg.MagnetSensor.MagnetOffset = 0.1; //0; // 3.24; //0; //-2.82; //-1.82; //-1.2; //-1.52; //-1.77; // -1.866; //-1.74; //-1.82;
-    //     m_rotateEncoder.getConfigurator().apply(cc_cfg);
+        wristMotorMMV.OverrideBrakeDurNeutral = true;
+        wristMotor.setVoltage(0);
 
-    //     /* Speed up signals to an appropriate rate */
-    //     m_rotateEncoder.getPosition().setUpdateFrequency(100);
-    //     m_rotateEncoder.getVelocity().setUpdateFrequency(100);
-    // }
+        zeroWristSensor();
+    }
+
     
     @Override
     public void processLoop(double timestamp) {
@@ -220,31 +232,49 @@ public class Arm implements Subsystem {
          SystemState newState;
          switch(m_currentState){
              default:
-             case ZERO:
-                newState = handleManual();
-                break;
              case NEUTRAL:
                  newState = handleManual();
                  break;
-             case GROUND_ANGLE:
+             case GROUND_CONE_ANGLE:
                  newState = handleManual();
                  break;
-             case HUMAN_FOLD:
+             case GROUND_CUBE_ANGLE:
                  newState = handleManual();
                  break;
-             case MID:
-                 newState = handleManual();
-                 break;
-             case HIGH:
+             case HUMAN_FEED_CONE:
                 newState = handleManual();
                 break;
-            case TRANSITION:
+            case HUMAN_FEED_CUBE:
                 newState = handleManual();
                 break;
-            case AUTON_MID:
+            case CONE_HIGH:
                 newState = handleManual();
                 break;
-            case AUTON_HIGH:
+            case CONE_MID:
+                newState = handleManual();
+                break;
+            case CUBE_HIGH:
+                newState = handleManual();
+                break;
+            case CUBE_MID:
+                newState = handleManual();
+                break;
+            case AUTON_CONE_HIGH:
+                newState = handleManual();
+                break;
+            case AUTON_CONE_MID:
+                newState = handleManual();
+                break;
+            case AUTON_CUBE_HIGH:
+                newState = handleManual();
+                break;
+            case AUTON_CUBE_MID:
+                newState = handleManual();
+                break;
+            case CONE_TRANSITION:
+                newState = handleManual();
+                break;
+            case CUBE_TRANSITION:
                 newState = handleManual();
                 break;
             case  MANUAL:
@@ -260,56 +290,57 @@ public class Arm implements Subsystem {
     @Override
     public void readPeriodicInputs(double timestamp) {
   
-       if(!m_extendLimitSwitch.get())
-           zeroExtendSensor();
 
-       if(!m_rotateLimitSwitch.get()){
-           //limit switch hit, position rotor should be at this point
-           //TODO - should this be -1.26?  or this is hit going backwards, so stay positive.
-           //  also should we be doing this every loop? and every time passed?
-           //  does this mess-up motion magic?
-           //  maybe should be only in manual mode?
-           m_rotateMotor.setRotorPosition(2.6);
-        }
 
         if (!(m_currentState == SystemState.MANUAL)){
             // if(m_intake.getIntakeCurrent()>=200 && m_intake.getCurrentState() != frc.robot.subsystems.Intake.SystemState.PLACING && m_intake.getCurrentState() != frc.robot.subsystems.Intake.SystemState.IDLE)
                // setWantedState(SystemState.NEUTRAL);
+            if(m_controller.getL1ButtonPressed()){ //m_intake.getCurrState() == Intake.SystemState.INTAKING_CONE
+                if(m_controller.getCrossButtonPressed())
+                    setWantedState(SystemState.GROUND_CONE_ANGLE);
 
-            if(m_controller.getCrossButtonPressed())
-                setWantedState(SystemState.GROUND_ANGLE);
+                if(m_controller.getR1ButtonPressed())
+                    setWantedState(SystemState.HUMAN_FEED_CONE);
+            }
+            if(m_controller.getL2ButtonPressed()){ //m_intake.getCurrState() == Intake.SystemState.INTAKING_CUBE
+                if(m_controller.getCrossButtonPressed())
+                    setWantedState(SystemState.GROUND_CUBE_ANGLE);
+
+                if(m_controller.getR1ButtonPressed())
+                    setWantedState(SystemState.HUMAN_FEED_CUBE);
+            }
+            if(m_intake.haveCone){
+                if(m_controller.getCircleButtonPressed())
+                    setWantedState(SystemState.CONE_MID);
+                if(m_controller.getSquareButtonPressed())
+                    setWantedState(SystemState.CONE_HIGH);
+            }
+            if(m_intake.haveCube){
+                if(m_controller.getCircleButtonPressed())
+                    setWantedState(SystemState.CUBE_MID);
+                if(m_controller.getSquareButtonPressed())
+                    setWantedState(SystemState.CUBE_HIGH);
+            }
+            
             if(m_controller.getCrossButtonReleased())
                 setWantedState(SystemState.NEUTRAL);
 
-            if(m_controller.getCircleButtonPressed())
-                setWantedState(SystemState.MID);
+            if(m_controller.getR1ButtonReleased())
+                setWantedState(SystemState.NEUTRAL);
 
             if(m_controller.getTriangleButtonPressed()){
-                if (m_currentState == SystemState.HIGH)
-                    new SequentialCommandGroup(new InstantCommand(() -> setWantedState(SystemState.TRANSITION)),
+                if (m_currentState == SystemState.CONE_HIGH)
+                    new SequentialCommandGroup(new InstantCommand(() -> setWantedState(SystemState.CONE_TRANSITION)),
                         new WaitCommand(0.5),
                         new InstantCommand(() -> setWantedState(SystemState.NEUTRAL))).schedule();
+                if (m_currentState == SystemState.CUBE_HIGH)
+                        new SequentialCommandGroup(new InstantCommand(() -> setWantedState(SystemState.CUBE_TRANSITION)),
+                            new WaitCommand(0.5),
+                            new InstantCommand(() -> setWantedState(SystemState.NEUTRAL))).schedule();
                 else
                     setWantedState(SystemState.NEUTRAL);
             }
-
-            if(m_controller.getSquareButtonPressed())
-                setWantedState(SystemState.HIGH);
-
-            if(m_controller.getR1ButtonPressed())
-                setWantedState(SystemState.HUMAN_FOLD); // hUMAN fOLD
-            if(m_controller.getR1ButtonReleased())
-                setWantedState(SystemState.NEUTRAL);
-            if (m_controller.getOptionsButtonPressed())
-                setWantedState(SystemState.ZERO);
             
-        } else {
-            if (m_controller.getOptionsButtonPressed()){
-                // TODO, how to do this with Pro API, 
-                // when rotateswitch is tripped, this is the rotate motor position value:
-                m_rotateMotor.setRotorPosition(0);
-                m_rotateMotor.setSafetyEnabled(m_manualMode);
-            }
         }
 
         if (m_controller.getPSButtonPressed()){
@@ -328,49 +359,84 @@ public class Arm implements Subsystem {
     public void writePeriodicOutputs(double timestamp)
     {
         switch (m_currentState){
-            case GROUND_ANGLE:
+            case GROUND_CONE_ANGLE:
 				//4096 ticks in a revolution
-				configRotate(-43.5);  //-20.8);   //-85190/4096
+				configRotate(-39.693);  //-20.8);   //42.693
                 // configRotateAngle(-110);
-				configExtend(0);	
+				configExtend(10.148);     //13.138
+                configWrist(0.513);	    //0.513
                 break;
-             case MID:			
-				configRotate(-24.0);  // -10.2);  //-42080/4096
+             case GROUND_CUBE_ANGLE:			
+				configRotate(-42.375);  // -10.2);  //-45.375
                 // configRotateAngle(-45);   //TODO: tweak angle
-                configExtend(24.0);    //39949/4096
+                configExtend(12.7939453125);    //15.7939453125
+                configWrist(1.704);             //1.904
                 break;
-            case HIGH:
-				configRotate(-21.0); // -9.6);   //-39320/4096
+            case HUMAN_FEED_CONE:
+				configRotate(0); // -9.6);   //-39320/4096
                 // configRotateAngle(45);   //TODO: tweak angle
-				configExtend(57.0);  //61.5);     //116256/4096
+				configExtend(0);  //61.5);     //116256/4096
+                configWrist(0);
                 break;
-            case AUTON_MID:
-	            configRotate(19.0); // 11.2);   //46080/4096
+            case HUMAN_FEED_CUBE:
+	            configRotate(0); // 11.2);   //46080/4096
                 // configRotateAngle(-45);   //TODO: tweak angle
-                configExtend(24.0);    //39949/4096
+                configExtend(0);    //39949/4096
+                configWrist(0);
                 break;
-            case AUTON_HIGH:
-				configRotate(19.0);    //(41320-4000)/4096
+            case CONE_HIGH:
+				configRotate(0);    //(41320-4000)/4096
                 // configRotateAngle(-45);   //TODO: tweak angle
-				configExtend(57.0);  //62.5);  //27.41);     //112256/4096
+				configExtend(0);  //62.5);  //27.41);     //112256/4096
+                configWrist(0);
                 break;
-            case TRANSITION:
-                configExtend(24.0);
-                configRotate(-21.0);
+            case CONE_MID:
+                configExtend(0);
+                configRotate(0);
+                configWrist(0);
+                break;
+            case CUBE_HIGH:
+                configExtend(0);
+                configRotate(0);
+                configWrist(0);
+                break;
+            case CUBE_MID:
+                configExtend(0);
+                configRotate(0);
+                configWrist(0);
+                break;
+            case AUTON_CONE_HIGH:
+                configExtend(0);
+                configRotate(0);
+                configWrist(0);
+                break;
+            case AUTON_CONE_MID:
+                configExtend(0);
+                configRotate(0);
+                configWrist(0);
+                break;
+            case AUTON_CUBE_HIGH:
+                configExtend(0);
+                configRotate(0);
+                configWrist(0);
+                break;
+            case AUTON_CUBE_MID:
+                configExtend(0);
+                configRotate(0);
+                configWrist(0);
+                break;
+            case CONE_TRANSITION:
+                configExtend(0);
+                configRotate(0);
+                configWrist(0);
+                break;
+            case CUBE_TRANSITION:
+                configExtend(0);
+                configRotate(0);
+                configWrist(0);
                 break;
             case MANUAL:
                 manualControl(m_controller.getLeftX(), -m_controller.getRightY());
-                break;
-            case HUMAN_FOLD:
-				configRotate(-24.0); // -10.1);   //-41320/4096
-                // configRotateAngle(40);   //TODO: tweak angle
-                configExtend(0);
-                break;
-            case ZERO:
-				//TODO how does this work? 
-                configRotate(24.0);   //70057/4096
-                // configRotateAngle(-45.10);
-                configExtend(0);
                 break;
             default:
             case NEUTRAL:
@@ -378,22 +444,11 @@ public class Arm implements Subsystem {
                 configRotate(0);
                 // configRotateAngle(0);
                 configExtend(0);
+                configWrist(0); //2.45
                 break;
             
         }
     }
-
-    // public void neutralize(){
-    //     if (m_rotateLimitSwitch.get()){
-    //         if (m_rotateMotor.getSelectedSensorPosition() < 0){
-    //             m_rotateMotor.set(ControlMode.PercentOutput, 0.4);
-    //         } else {
-    //             m_rotateMotor.set(ControlMode.PercentOutput, -0.4); 
-    //         }
-    //     } else {
-    //         m_rotateMotor.set(ControlMode.PercentOutput, 0);
-    //     }
-    // }
 
     @Override
     public void stop() {
@@ -407,6 +462,7 @@ public class Arm implements Subsystem {
         SmartDashboard.putBoolean("RotateLimitSwitch", m_rotateLimitSwitch.get());
         SmartDashboard.putString("Extend Motor Pos", m_extendMotor.getPosition().toString());
         SmartDashboard.putString("Rotate Motor Pos", m_rotateMotor.getPosition().toString());
+        SmartDashboard.putString("Wrist Motor Pos", wristMotor.getPosition().toString());
 		SmartDashboard.putString("Extend Motor Temp", m_extendMotor.getDeviceTemp().toString());
 		SmartDashboard.putString("Rotate Motor Temp", m_rotateMotor.getDeviceTemp().toString());
         // SmartDashboard.putNumber("rotate angle commanded", m_rotate_angle);
@@ -438,6 +494,10 @@ public class Arm implements Subsystem {
         m_rotateMotor.setControl(m_rotateMotorMMV.withPosition(position));
     }
 
+    public void configWrist(double position){
+        wristMotor.setControl(wristMotorMMV.withPosition(position));
+    }
+
     // public void configRotateAngle(double angle){
     //     m_rotate_angle = angle;
     //     m_rotate_rotations = (m_rotate_angle) / 360;
@@ -453,6 +513,7 @@ public class Arm implements Subsystem {
     public void zeroSensors() {
 	    zeroExtendSensor();
         zeroRotateSensor();
+        zeroWristSensor();
     }
    
     public void zeroExtendSensor(){
@@ -469,6 +530,9 @@ public class Arm implements Subsystem {
         //NOPE, magnet offset did not work.   go back to set rotor to zero.
     }
 
+    public void zeroWristSensor(){
+        wristMotor.setRotorPosition(0);
+    }
 
     public void manualControl(double rotatePercentOutput, double armPercentOutput){
         m_rotateMotor.setControl(m_rotateVoltageOut.withOutput(Constants.ARM.MAX_MANUAL_SUPPLY_VOLTAGE*rotatePercentOutput/4));
