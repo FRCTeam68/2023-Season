@@ -80,7 +80,7 @@ public class Limelight implements Subsystem {
                 break;
             default:
             case NEUTRAL:
-                setCameraMode(1, 1 , 0);
+                setCameraMode(1, 1, 0);
                 break;
         }
     }

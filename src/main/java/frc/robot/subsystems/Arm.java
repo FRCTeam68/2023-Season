@@ -200,7 +200,7 @@ public class Arm implements Subsystem {
 
         TalonFXConfiguration cfg = new TalonFXConfiguration();
 
-        cfg.MotionMagic.MotionMagicCruiseVelocity = 5;
+        cfg.MotionMagic.MotionMagicCruiseVelocity = 2; //5
         cfg.MotionMagic.MotionMagicAcceleration = 2;
 
         cfg.Slot0.kP = 55.0F;
@@ -312,6 +312,13 @@ public class Arm implements Subsystem {
                     setWantedState(SystemState.HUMAN_FEED_CONE);
                     m_intake.setWantedState(Intake.SystemState.INTAKING_CONE);
                 }
+                if (m_intake.haveCone){
+                    m_intake.setWantedState(Intake.SystemState.IDLE);
+                }
+                if(m_controller.getCircleButtonPressed())
+                    setWantedState(SystemState.CONE_MID);
+                if(m_controller.getSquareButtonPressed())
+                    setWantedState(SystemState.CONE_HIGH);
             }
             if(m_controller.getL2Button()){ //m_intake.getCurrState() == Intake.SystemState.INTAKING_CUBE
                 if(m_controller.getCrossButtonPressed()){
@@ -322,20 +329,19 @@ public class Arm implements Subsystem {
                     setWantedState(SystemState.HUMAN_FEED_CUBE);
                     m_intake.setWantedState(Intake.SystemState.INTAKING_CUBE);
                 }
-            }
-            if(m_intake.haveCone){
-                if(m_controller.getCircleButtonPressed())
-                    setWantedState(SystemState.CONE_MID);
-                if(m_controller.getSquareButtonPressed())
-                    setWantedState(SystemState.CONE_HIGH);
-                if(m_controller.getCircleButtonPressed())
-                    setWantedState(SystemState.CONE_GROUND);
-            }
-            if(m_intake.haveCube){
+
                 if(m_controller.getCircleButtonPressed())
                     setWantedState(SystemState.CUBE_MID);
                 if(m_controller.getSquareButtonPressed())
                     setWantedState(SystemState.CUBE_HIGH);
+            }
+            if(m_intake.haveCone){
+                if(m_controller.getCircleButtonPressed())
+                    setWantedState(SystemState.CONE_GROUND);
+                
+            }
+            if(m_intake.haveCube){
+                
                 if(m_controller.getCrossButtonPressed())
                     setWantedState(SystemState.CUBE_GROUND);
             }
@@ -393,7 +399,7 @@ public class Arm implements Subsystem {
             case HUMAN_FEED_CONE:
 				configRotate(9.877); // -9.6);   //9.87
                 // configRotateAngle(45);   //TODO: tweak angle
-				configExtend(42.697);  //61.5);  //
+				configExtend(44.697);  //61.5);  //
                 configWrist(2.276);              // 2.76
                 break;
             case HUMAN_FEED_CUBE:
@@ -403,20 +409,20 @@ public class Arm implements Subsystem {
                 configWrist(2.777);               //2.777
                 break;
             case CONE_HIGH:
-				configRotate(0);    //(41320-4000)/4096
+				configRotate(17.217);    //(41320-4000)/4096
                 // configRotateAngle(-45);   //TODO: tweak angle
-				configExtend(0);  //62.5);  //27.41);     //112256/4096
-                configWrist(0);
+				configExtend(64.58);  //62.5);  //27.41);     //112256/4096
+                configWrist(1.600);
                 break;
             case CONE_MID:
-                configExtend(0);
-                configRotate(0);
-                configWrist(0);
+                configExtend(29.015); //29.015
+                configRotate(16.217);
+                configWrist(1.669);
                 break;
             case CONE_GROUND:
                 configExtend(0);
-                configRotate(0);
-                configWrist(0);
+                configRotate(25.92);
+                configWrist(1.669);
                 break;
             case CUBE_HIGH:
                 configExtend(57.54);

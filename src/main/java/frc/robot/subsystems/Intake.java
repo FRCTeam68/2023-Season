@@ -27,10 +27,11 @@ public class Intake implements Subsystem {
         INTAKING_CONE,
         INTAKING_CUBE,
         IDLE_CUBE,
+        TRANSITION_CONE,
         PLACING
     }
 
-    private SystemState currentState = SystemState.IDLE;
+    public SystemState currentState = SystemState.IDLE;
     private SystemState wantedState = SystemState.IDLE;
     
 
@@ -64,6 +65,9 @@ public class Intake implements Subsystem {
         switch (currentState){
             default:
             case INTAKING_CONE:
+                newState = handleManual();
+                break;
+            case TRANSITION_CONE:
                 newState = handleManual();
                 break;
             case INTAKING_CUBE:
@@ -106,10 +110,10 @@ public class Intake implements Subsystem {
         }
         
         if(controller.getR2ButtonPressed()){
-            if(haveCone)
+            if(controller.getL1Button())
             setWantedState(SystemState.PLACING);
 
-            if(haveCube)
+            if(controller.getL2Button())
             setWantedState(SystemState.IDLE_CUBE);
 
             else
@@ -132,11 +136,14 @@ public class Intake implements Subsystem {
             case INTAKING_CONE:
                 setIntakeSpeed(-1);
                 break;
+            case TRANSITION_CONE:
+                setIntakeSpeed(-.5);
+                break;
             case INTAKING_CUBE:
-                setIntakeSpeed(.5);
+                setIntakeSpeed(1);
                 break;
             case PLACING:
-                setIntakeSpeed(.3);
+                setIntakeSpeed(.7);
                 break;
             case IDLE_CUBE:
                 setIntakeSpeed(-.4);
