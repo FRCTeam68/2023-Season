@@ -38,8 +38,10 @@ public class Arm implements Subsystem {
         RAMP_FEED_CUBE,
         CONE_HIGH,
         CONE_MID,
+        CONE_GROUND,
         CUBE_HIGH,
         CUBE_MID,
+        CUBE_GROUND,
         AUTON_CONE_MID,
         AUTON_CONE_HIGH,
         AUTON_CUBE_MID,
@@ -253,10 +255,16 @@ public class Arm implements Subsystem {
             case CONE_MID:
                 newState = handleManual();
                 break;
+            case CONE_GROUND:
+                newState = handleManual();
+                break;
             case CUBE_HIGH:
                 newState = handleManual();
                 break;
             case CUBE_MID:
+                newState = handleManual();
+                break;
+            case CUBE_GROUND:
                 newState = handleManual();
                 break;
             case AUTON_CONE_HIGH:
@@ -320,12 +328,16 @@ public class Arm implements Subsystem {
                     setWantedState(SystemState.CONE_MID);
                 if(m_controller.getSquareButtonPressed())
                     setWantedState(SystemState.CONE_HIGH);
+                if(m_controller.getCircleButtonPressed())
+                    setWantedState(SystemState.CONE_GROUND);
             }
             if(m_intake.haveCube){
                 if(m_controller.getCircleButtonPressed())
                     setWantedState(SystemState.CUBE_MID);
                 if(m_controller.getSquareButtonPressed())
                     setWantedState(SystemState.CUBE_HIGH);
+                if(m_controller.getCrossButtonPressed())
+                    setWantedState(SystemState.CUBE_GROUND);
             }
             
             if(m_controller.getCrossButtonReleased())
@@ -373,10 +385,10 @@ public class Arm implements Subsystem {
                 configWrist(0.513);	    //0.513
                 break;
              case GROUND_CUBE_ANGLE:			
-				configRotate(-45.375);  // -10.2);  //-45.375
+				configRotate(-46.152);  // -10.2);  //-45.375
                 // configRotateAngle(-45);   //TODO: tweak angle
-                configExtend(11.7939453125);    //15.7939453125
-                configWrist(1.804);             //1.904
+                configExtend(0);    //15.7939453125
+                configWrist(1.51);             //1.904
                 break;
             case HUMAN_FEED_CONE:
 				configRotate(9.877); // -9.6);   //9.87
@@ -401,15 +413,25 @@ public class Arm implements Subsystem {
                 configRotate(0);
                 configWrist(0);
                 break;
-            case CUBE_HIGH:
+            case CONE_GROUND:
                 configExtend(0);
                 configRotate(0);
                 configWrist(0);
                 break;
+            case CUBE_HIGH:
+                configExtend(57.54);
+                configRotate(-20.16);
+                configWrist(.904);
+                break;
             case CUBE_MID:
+                configExtend(34.07);
+                configRotate(-20.16);
+                configWrist(.338);
+                break;
+            case CUBE_GROUND:
                 configExtend(0);
-                configRotate(0);
-                configWrist(0);
+                configRotate(-20.16);
+                configWrist(.904);
                 break;
             case AUTON_CONE_HIGH:
                 configExtend(0);
