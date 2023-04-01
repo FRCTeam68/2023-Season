@@ -295,19 +295,25 @@ public class Arm implements Subsystem {
         if (!(m_currentState == SystemState.MANUAL)){
             // if(m_intake.getIntakeCurrent()>=200 && m_intake.getCurrentState() != frc.robot.subsystems.Intake.SystemState.PLACING && m_intake.getCurrentState() != frc.robot.subsystems.Intake.SystemState.IDLE)
                // setWantedState(SystemState.NEUTRAL);
-            if(m_controller.getL1ButtonPressed()){ //m_intake.getCurrState() == Intake.SystemState.INTAKING_CONE
-                if(m_controller.getCrossButtonPressed())
+            if(m_controller.getL1Button()){ //m_intake.getCurrState() == Intake.SystemState.INTAKING_CONE
+                if(m_controller.getCrossButtonPressed()){
                     setWantedState(SystemState.GROUND_CONE_ANGLE);
-
-                if(m_controller.getR1ButtonPressed())
+                    m_intake.setWantedState(Intake.SystemState.INTAKING_CONE);
+                }
+                if(m_controller.getR1ButtonPressed()){
                     setWantedState(SystemState.HUMAN_FEED_CONE);
+                    m_intake.setWantedState(Intake.SystemState.INTAKING_CONE);
+                }
             }
-            if(m_controller.getL2ButtonPressed()){ //m_intake.getCurrState() == Intake.SystemState.INTAKING_CUBE
-                if(m_controller.getCrossButtonPressed())
+            if(m_controller.getL2Button()){ //m_intake.getCurrState() == Intake.SystemState.INTAKING_CUBE
+                if(m_controller.getCrossButtonPressed()){
                     setWantedState(SystemState.GROUND_CUBE_ANGLE);
-
-                if(m_controller.getR1ButtonPressed())
+                    m_intake.setWantedState(Intake.SystemState.INTAKING_CUBE);
+                }
+                if(m_controller.getR1ButtonPressed()){
                     setWantedState(SystemState.HUMAN_FEED_CUBE);
+                    m_intake.setWantedState(Intake.SystemState.INTAKING_CUBE);
+                }
             }
             if(m_intake.haveCone){
                 if(m_controller.getCircleButtonPressed())
@@ -361,28 +367,28 @@ public class Arm implements Subsystem {
         switch (m_currentState){
             case GROUND_CONE_ANGLE:
 				//4096 ticks in a revolution
-				configRotate(-39.693);  //-20.8);   //42.693
+				configRotate(-42.393);  //-20.8);   //42.693
                 // configRotateAngle(-110);
-				configExtend(10.148);     //13.138
+				configExtend(11.148);     //13.138
                 configWrist(0.513);	    //0.513
                 break;
              case GROUND_CUBE_ANGLE:			
-				configRotate(-42.375);  // -10.2);  //-45.375
+				configRotate(-45.375);  // -10.2);  //-45.375
                 // configRotateAngle(-45);   //TODO: tweak angle
-                configExtend(12.7939453125);    //15.7939453125
-                configWrist(1.704);             //1.904
+                configExtend(11.7939453125);    //15.7939453125
+                configWrist(1.804);             //1.904
                 break;
             case HUMAN_FEED_CONE:
-				configRotate(0); // -9.6);   //-39320/4096
+				configRotate(9.877); // -9.6);   //9.87
                 // configRotateAngle(45);   //TODO: tweak angle
-				configExtend(0);  //61.5);     //116256/4096
-                configWrist(0);
+				configExtend(42.697);  //61.5);  //
+                configWrist(2.276);              // 2.76
                 break;
             case HUMAN_FEED_CUBE:
-	            configRotate(0); // 11.2);   //46080/4096
+	            configRotate(10.668); // 11.2);   //10.688
                 // configRotateAngle(-45);   //TODO: tweak angle
-                configExtend(0);    //39949/4096
-                configWrist(0);
+                configExtend(24.557);             //24.557
+                configWrist(2.777);               //2.777
                 break;
             case CONE_HIGH:
 				configRotate(0);    //(41320-4000)/4096
@@ -444,7 +450,7 @@ public class Arm implements Subsystem {
                 configRotate(0);
                 // configRotateAngle(0);
                 configExtend(0);
-                configWrist(0); //2.45
+                configWrist(2.45); //2.45
                 break;
             
         }
@@ -463,16 +469,18 @@ public class Arm implements Subsystem {
         SmartDashboard.putString("Extend Motor Pos", m_extendMotor.getPosition().toString());
         SmartDashboard.putString("Rotate Motor Pos", m_rotateMotor.getPosition().toString());
         SmartDashboard.putString("Wrist Motor Pos", wristMotor.getPosition().toString());
-		SmartDashboard.putString("Extend Motor Temp", m_extendMotor.getDeviceTemp().toString());
-		SmartDashboard.putString("Rotate Motor Temp", m_rotateMotor.getDeviceTemp().toString());
+		// SmartDashboard.putString("Extend Motor Temp", m_extendMotor.getDeviceTemp().toString());
+		// SmartDashboard.putString("Rotate Motor Temp", m_rotateMotor.getDeviceTemp().toString());
         // SmartDashboard.putNumber("rotate angle commanded", m_rotate_angle);
         SmartDashboard.putNumber("rotate rotations commanded", m_rotate_rotations);
         SmartDashboard.putBoolean("Manual Mode", m_manualMode);
+        SmartDashboard.putBoolean("L1 button", m_controller.getL1Button());
+        SmartDashboard.putBoolean("L2 button", m_controller.getL2Button());
         // SmartDashboard.putString("rotate encoder pos", m_rotateEncoder.getPosition().toString());
         // SmartDashboard.putBoolean("Ext Motor sfty en", m_extendMotor.isSafetyEnabled());
         // SmartDashboard.putBoolean("Rot Motor sfty en", m_rotateMotor.isSafetyEnabled());
-        SmartDashboard.putNumber("Ext Motor sup cur", m_extendMotor.getSupplyCurrent().getValue());
-        SmartDashboard.putNumber("Rot Motor sup cur", m_rotateMotor.getSupplyCurrent().getValue());
+        // SmartDashboard.putNumber("Ext Motor sup cur", m_extendMotor.getSupplyCurrent().getValue());
+        // SmartDashboard.putNumber("Rot Motor sup cur", m_rotateMotor.getSupplyCurrent().getValue());
     }
 
     private SystemState handleManual(){
@@ -533,6 +541,17 @@ public class Arm implements Subsystem {
     public void zeroWristSensor(){
         wristMotor.setRotorPosition(0);
     }
+
+   
+    // private boolean getL1(){
+    //     boolean triggered;
+    //     if(m_controller.getL1ButtonPressed())
+    //         triggered = true;
+    //     if(m_controller.getL1ButtonReleased())
+    //         triggered = false;
+
+    //     return triggered;
+    // }
 
     public void manualControl(double rotatePercentOutput, double armPercentOutput){
         m_rotateMotor.setControl(m_rotateVoltageOut.withOutput(Constants.ARM.MAX_MANUAL_SUPPLY_VOLTAGE*rotatePercentOutput/4));

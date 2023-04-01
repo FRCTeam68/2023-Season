@@ -104,9 +104,17 @@ public class Intake implements Subsystem {
         if (currentState == SystemState.INTAKING_CUBE && getIntakeCurrent() > 100){
             haveCube = true;
         }
-     
-        if (controller.getR2ButtonPressed()){
+        
+        if(controller.getR2ButtonPressed()){
+            if(haveCone)
             setWantedState(SystemState.PLACING);
+
+            if(haveCube)
+            setWantedState(SystemState.IDLE_CUBE);
+
+            else
+            setWantedState(SystemState.PLACING);
+
             haveCone = false;
             haveCube = false;
         }
@@ -125,13 +133,13 @@ public class Intake implements Subsystem {
                 setIntakeSpeed(-1);
                 break;
             case INTAKING_CUBE:
-                setIntakeSpeed(-.3);
+                setIntakeSpeed(.3);
                 break;
             case PLACING:
                 setIntakeSpeed(.15);
                 break;
             case IDLE_CUBE:
-                setIntakeSpeed(-.1);
+                setIntakeSpeed(-.3);
                 break;
             default:
             case IDLE:
