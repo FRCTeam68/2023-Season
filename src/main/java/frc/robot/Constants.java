@@ -176,7 +176,6 @@ public final class Constants {
                 new Translation2d(-DRIVE.TRACKWIDTH_METERS / 2.0, -DRIVE.WHEELBASE_METERS / 2.0)
         );
 
-        public static final int MAX_FWD_REV_SPEED_MPS_EST = 10;
         public static final int MAX_ROTATE_SPEED_RAD_PER_SEC_EST = 10;
         static public final double MAX_FWD_REV_SPEED_FAST = 0.5; // Percent of output power
         static public final double MAX_STRAFE_SPEED_FAST = 0.5;
@@ -190,7 +189,7 @@ public final class Constants {
          *
          * Should be measured from center to center.
          */
-
+        public static final double MAX_VELOCITY_METERS_PER_SECOND = 5.63;
          public static final double CRUISING_SPEED = 1;
     }
 
