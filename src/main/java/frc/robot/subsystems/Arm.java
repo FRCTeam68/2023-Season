@@ -96,6 +96,8 @@ public class Arm implements Subsystem {
     protected double m_rotateEncoderVelocity = 0;
     protected double m_rotateEncoderRotations = 0;
 
+    protected double m_rotateGroundAdjust = 0;
+    protected double m_rotatePlacingAdjust = 0;
 
     private final Intake m_intake;
     private final PS4Controller m_controller;
@@ -387,6 +389,27 @@ public class Arm implements Subsystem {
             if (m_controller.getOptionsButtonPressed()){
                     syncRotateMotor();
             }
+
+    
+            if (m_controller.getLeftX()<-0.3)  {  //if (m_controller.getPOV() = 270)
+                // d-pad left pressed, move arm left or down 1 rotatation more 
+                if(m_currentState == SystemState.GROUND_ANGLE)
+                    m_rotateGroundAdjust=m_rotateGroundAdjust-1;
+                else if ((m_currentState == SystemState.HIGH)||(m_currentState == SystemState.MID))
+                    m_rotatePlacingAdjust=m_rotatePlacingAdjust-1;
+            }
+            else if (m_controller.getLeftX()>0.3) {  //if (m_controller.getPOV() = 90)
+                // if d-pad right pressed, move arm right or up 1 rotatation more
+                if(m_currentState == SystemState.GROUND_ANGLE)
+                    m_rotateGroundAdjust=m_rotateGroundAdjust+1;
+                else if ((m_currentState == SystemState.HIGH)||(m_currentState == SystemState.MID))
+                    m_rotatePlacingAdjust=m_rotatePlacingAdjust+1;
+            }
+            if (m_controller.getLeftY()<-0.3)  {  //if (m_controller.getPOV() = 180)
+                // d-pad down pressed, zero adjustments 
+                m_rotateGroundAdjust=0;
+                m_rotatePlacingAdjust=0;
+            }
         }
 
 		else{
@@ -396,6 +419,8 @@ public class Arm implements Subsystem {
                     //note: user must have arm in neutral position
                     zeroRotateSensor();
                     zeroRotateEncoder();
+                    m_rotateGroundAdjust=0;
+                    m_rotatePlacingAdjust=0;
                 }
             }
         }
@@ -417,30 +442,24 @@ public class Arm implements Subsystem {
     {
         switch (m_currentState){
             case GROUND_ANGLE:
-				//4096 ticks in a revolution
-				configRotate(-43.5);  //-20.8);   //-85190/4096
-                // configRotateAngle(-110);
+				configRotate(-43.5 + m_rotateGroundAdjust);
 				configExtend(0);	
                 break;
-             case MID:			
-				configRotate(-24.0);  // -10.2);  //-42080/4096
-                // configRotateAngle(-45);   //TODO: tweak angle
-                configExtend(24.0);    //39949/4096
+             case MID:		
+				configRotate(-24.0 + m_rotatePlacingAdjust); 
+                configExtend(24.0);
                 break;
             case HIGH:
-				configRotate(-21.0); // -9.6);   //-39320/4096
-                // configRotateAngle(45);   //TODO: tweak angle
-				configExtend(57.0);  //61.5);     //116256/4096
+				configRotate(-21.0 + m_rotatePlacingAdjust); 
+				configExtend(57.0);
                 break;
             case AUTON_MID:
-	            configRotate(19.0); // 11.2);   //46080/4096
-                // configRotateAngle(-45);   //TODO: tweak angle
-                configExtend(24.0);    //39949/4096
+	            configRotate(19.0); 
+                configExtend(24.0);
                 break;
             case AUTON_HIGH:
-				configRotate(19.0);    //(41320-4000)/4096
-                // configRotateAngle(-45);   //TODO: tweak angle
-				configExtend(57.0);  //62.5);  //27.41);     //112256/4096
+				configRotate(19.0);
+				configExtend(57.0);
                 break;
             case TRANSITION:
                 configExtend(24.0);
@@ -450,8 +469,7 @@ public class Arm implements Subsystem {
                 manualControl(m_controller.getLeftX(), -m_controller.getRightY());
                 break;
             case HUMAN_FOLD:
-				configRotate(-24.0); // -10.1);   //-41320/4096
-                // configRotateAngle(40);   //TODO: tweak angle
+				configRotate(-24.0);
                 configExtend(0);
                 break;
             case PUNCH:
@@ -465,9 +483,7 @@ public class Arm implements Subsystem {
 
             default:
             case NEUTRAL:
-                // neutralize();
                 configRotate(0);
-                // configRotateAngle(0);
                 configExtend(0);
                 break;
             
@@ -525,6 +541,8 @@ public class Arm implements Subsystem {
         SmartDashboard.putNumber("Arm Ecdr Angle", m_rotateEncoderAngle);
         SmartDashboard.putNumber("Arm Ecdr Rot", m_rotateEncoderRotations);
         SmartDashboard.putNumber("Arm Ecdr Velocity", m_rotateEncoderVelocity);
+        SmartDashboard.putNumber("Rotate Ground Adjust", m_rotateGroundAdjust);
+        SmartDashboard.putNumber("Rotate Placing Adjust", m_rotatePlacingAdjust);
         SmartDashboard.putNumber("PDH Voltage", m_PDH.getVoltage());
         SmartDashboard.putNumber("PDH Current", m_PDH.getTotalCurrent());
         SmartDashboard.putNumber("Arm Error", percentOutputError());
