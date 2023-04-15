@@ -104,6 +104,7 @@ public class Arm implements Subsystem {
     private final PowerDistribution m_PDH; 
 
     private boolean m_manualMode = false;
+    private boolean dHeld = false;
 
     public Arm(PS4Controller controller, Intake intake){
 
@@ -391,24 +392,30 @@ public class Arm implements Subsystem {
             }
 
     
-            if (m_controller.getLeftX()<-0.3)  {  //if (m_controller.getPOV() = 270)
+            if (m_controller.getL3ButtonPressed())  {  //if (m_controller.getPOV() = 270)
                 // d-pad left pressed, move arm left or down 1 rotatation more 
                 if(m_currentState == SystemState.GROUND_ANGLE)
                     m_rotateGroundAdjust=m_rotateGroundAdjust-1;
                 else if ((m_currentState == SystemState.HIGH)||(m_currentState == SystemState.MID))
                     m_rotatePlacingAdjust=m_rotatePlacingAdjust-1;
+                dHeld = true;
             }
-            else if (m_controller.getLeftX()>0.3) {  //if (m_controller.getPOV() = 90)
+            else if (m_controller.getR3ButtonPressed()) {  //if (m_controller.getPOV() = 90)
                 // if d-pad right pressed, move arm right or up 1 rotatation more
                 if(m_currentState == SystemState.GROUND_ANGLE)
                     m_rotateGroundAdjust=m_rotateGroundAdjust+1;
                 else if ((m_currentState == SystemState.HIGH)||(m_currentState == SystemState.MID))
                     m_rotatePlacingAdjust=m_rotatePlacingAdjust+1;
+                dHeld = true;
             }
-            if (m_controller.getLeftY()<-0.3)  {  //if (m_controller.getPOV() = 180)
+            if (m_controller.getShareButtonPressed())  {  //if (m_controller.getPOV() = 180)
                 // d-pad down pressed, zero adjustments 
                 m_rotateGroundAdjust=0;
                 m_rotatePlacingAdjust=0;
+            }
+
+            if (m_controller.getLeftX() == 0){
+                dHeld = false;
             }
         }
 
@@ -483,6 +490,8 @@ public class Arm implements Subsystem {
 
             default:
             case NEUTRAL:
+                m_rotateGroundAdjust=0;
+                m_rotatePlacingAdjust=0;
                 configRotate(0);
                 configExtend(0);
                 break;
