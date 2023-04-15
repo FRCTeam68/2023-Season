@@ -177,10 +177,10 @@ public class Drivetrain implements Subsystem {
         
         
         mSwerveMods = new SwerveModule[] {
-        new SwerveModule(0, Constants.Swerve.Mod0.constants),
-        new SwerveModule(1, Constants.Swerve.Mod1.constants),
-        new SwerveModule(2, Constants.Swerve.Mod2.constants),
-        new SwerveModule(3, Constants.Swerve.Mod3.constants)
+        new SwerveModule(0, Constants.Swerve.Mod0.constants, "SWERVEbus"),
+        new SwerveModule(1, Constants.Swerve.Mod1.constants, "SWERVEbus"),
+        new SwerveModule(2, Constants.Swerve.Mod2.constants, "SWERVEbus"),
+        new SwerveModule(3, Constants.Swerve.Mod3.constants,"SWERVEbus")
         };
         
         odometry = new SwerveDriveOdometry(m_kinematics, getYaw(), getModulePositions());
@@ -529,8 +529,8 @@ public class Drivetrain implements Subsystem {
         // SmartDashboard.putNumber("drivetrain/goalVx", periodicIO.goalVx);
         // SmartDashboard.putNumber("drivetrain/goalVy", periodicIO.goalVy);
         
-        // SmartDashboard.putNumber("PosX", odometry.getPoseMeters().getTranslation().getX());
-        // SmartDashboard.putNumber("PosY", odometry.getPoseMeters().getTranslation().getY());
+        SmartDashboard.putNumber("PosX", odometry.getPoseMeters().getTranslation().getX());
+        SmartDashboard.putNumber("PosY", odometry.getPoseMeters().getTranslation().getY());
         SmartDashboard.putBoolean("NAVX Connected", ahrs.isConnected());
         SmartDashboard.putNumber("Yaw", getYaw().getRadians());
         SmartDashboard.putNumber("Goal Angle", (getYaw().getRadians() - Math.toRadians(yawToLock)));
