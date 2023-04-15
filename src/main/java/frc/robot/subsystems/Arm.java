@@ -483,6 +483,7 @@ public class Arm implements Subsystem {
 
             default:
             case NEUTRAL:
+                m_rotatePlacingAdjust=0;
                 configRotate(0);
                 configExtend(0);
                 break;
