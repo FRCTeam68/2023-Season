@@ -344,6 +344,9 @@ public class Drivetrain implements Subsystem {
             balancedX = true;
         }
 
+        if (controller.getBButtonPressed()) // Reseting gyroscope yaw
+            zeroGyroscope();
+
         if (controller.getRightBumper())
             limelightLock = true;
         else
