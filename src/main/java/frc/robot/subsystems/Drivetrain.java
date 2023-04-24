@@ -52,6 +52,8 @@ public class Drivetrain implements Subsystem {
 
     public static double pitchAngle = 0;
 
+    public static final double ZERO_YAW = 180;
+
     public static double yawToLock = 0;
 
     private boolean limelightLock = false;
@@ -535,7 +537,7 @@ public class Drivetrain implements Subsystem {
         SmartDashboard.putNumber("PosX", odometry.getPoseMeters().getTranslation().getX());
         SmartDashboard.putNumber("PosY", odometry.getPoseMeters().getTranslation().getY());
         SmartDashboard.putBoolean("NAVX Connected", ahrs.isConnected());
-        SmartDashboard.putNumber("Yaw", getYaw().getRadians());
+        SmartDashboard.putNumber("Yaw", getYaw().getDegrees());
         SmartDashboard.putNumber("Goal Angle", (getYaw().getRadians() - Math.toRadians(yawToLock)));
         SmartDashboard.putNumber("Pitch", pitchAngle);
         SmartDashboard.putNumber("Goal switch",         lockToPi(Math.toRadians(yawToLock) + Math.PI*2)
@@ -656,7 +658,7 @@ public class Drivetrain implements Subsystem {
     public Rotation2d getYaw() {
         if (ahrs.isMagnetometerCalibrated()) {
             // We will only get valid fused headings if the magnetometer is calibrated
-            return Rotation2d.fromDegrees(ahrs.getFusedHeading());
+            // return Rotation2d.fromDegrees(ahrs.getFusedHeading() + 180);
           }
        //
        //    // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.

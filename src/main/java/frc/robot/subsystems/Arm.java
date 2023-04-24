@@ -387,7 +387,7 @@ public class Arm implements Subsystem {
             if(m_controller.getR1ButtonReleased())
                 setWantedState(SystemState.NEUTRAL);
 
-            if (m_controller.getOptionsButtonPressed()){
+            if (m_controller.getOptionsButtonPressed()){ // Zeroing
                     syncRotateMotor();
             }
 
@@ -552,8 +552,8 @@ public class Arm implements Subsystem {
         SmartDashboard.putNumber("Arm Ecdr Velocity", m_rotateEncoderVelocity);
         SmartDashboard.putNumber("Rotate Ground Adjust", m_rotateGroundAdjust);
         SmartDashboard.putNumber("Rotate Placing Adjust", m_rotatePlacingAdjust);
-        SmartDashboard.putNumber("PDH Voltage", m_PDH.getVoltage());
-        SmartDashboard.putNumber("PDH Current", m_PDH.getTotalCurrent());
+        // SmartDashboard.putNumber("PDH Voltage", m_PDH.getVoltage());
+        // SmartDashboard.putNumber("PDH Current", m_PDH.getTotalCurrent());
         SmartDashboard.putNumber("Arm Error", percentOutputError());
     }
 
