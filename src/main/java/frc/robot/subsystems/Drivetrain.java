@@ -290,13 +290,11 @@ public class Drivetrain implements Subsystem {
                 controller.getRightX()) * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND;
         periodicIO.robotOrientedModifier = controller.getLeftTriggerAxis() > 0.25;
 
-        // periodicIO.modifiedJoystickX = -slewX
-        //         .calculate(-controller.getLeftX() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND));
-        // periodicIO.modifiedJoystickY = -slewY
-        //         .calculate(-controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND));
+         periodicIO.modifiedJoystickX = slewX.calculate(-controller.getLeftX() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND));
+         periodicIO.modifiedJoystickY = slewY.calculate(-controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND));
 
-        periodicIO.modifiedJoystickX = controller.getLeftX() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND);
-        periodicIO.modifiedJoystickY = controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND);
+        //periodicIO.modifiedJoystickX = controller.getLeftX() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND);
+        //periodicIO.modifiedJoystickY = controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND);
 
         if (limelightLock) {
             periodicIO.modifiedJoystickX = slewX
@@ -306,8 +304,7 @@ public class Drivetrain implements Subsystem {
                     .calculate(MathUtil.clamp(-controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND),
                             -Constants.DRIVE.CRUISING_SPEED, Constants.DRIVE.CRUISING_SPEED));
         }
-        periodicIO.modifiedJoystickR = -slewRot
-                .calculate(-controller.getRightX() * halfWhenCrawl(MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND)) * 0.75;
+        periodicIO.modifiedJoystickR = slewRot.calculate(-controller.getRightX() * halfWhenCrawl(MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND)) * 0.75;
 
         checkButtons();
 
