@@ -169,54 +169,66 @@ public class Drivetrain implements Subsystem {
             driveGains.kP = 2;
         }
 
-        SwerveDriveConstantsCreator constants =  new SwerveDriveConstantsCreator(Constants.Swerve.gearRatio, Constants.Swerve.angleGearRatio, 
-        2, 400, steerGains, driveGains, false);
+        SwerveDriveConstantsCreator constants =  new SwerveDriveConstantsCreator(
+            Constants.Swerve.gearRatio, 
+            Constants.Swerve.angleGearRatio,
+            2,
+            400,
+            steerGains, 
+            driveGains, 
+            false);
     
 
-        drivetrain = new CTRSwerveDrivetrain(new SwerveDriveTrainConstants().withTurnKp(Constants.Swerve.angleKP).withPigeon2Id(50).withCANbusName("MANIPbus"),
+        drivetrain = new CTRSwerveDrivetrain(
+            new SwerveDriveTrainConstants()
+                .withTurnKp(Constants.Swerve.angleKP)
+                .withPigeon2Id(50)
+                .withCANbusName("MANIPbus"),
 
-        constants.createModuleConstants(Constants.Swerve.Mod0.angleMotorID, Constants.Swerve.Mod0.driveMotorID, 
-                Constants.Swerve.Mod0.canCoderID, Constants.Swerve.Mod0.dobOffset, 0.260, 0.222)
-                        ,
+            // Front Left  
+            constants.createModuleConstants(  
+                Constants.Swerve.Mod0.canCoderID, 
+                Constants.Swerve.Mod0.driveMotorID,
+                Constants.Swerve.Mod0.angleMotorID,
+                Constants.Swerve.Mod0.dobOffset, 
+                Constants.Swerve.wheelBase / 2.0,   // x Location in WPI is forward of robot center
+                Constants.Swerve.trackWidth / 2.0), // y Location in WPI is left of robot center
+                // 0.260, 
+                // 0.222),
 
-                new SwerveModuleConstants().withCANcoderId(Constants.Swerve.Mod1.canCoderID)
-                        .withDriveMotorId(Constants.Swerve.Mod1.driveMotorID)
-                        .withSteerMotorId(Constants.Swerve.Mod1.angleMotorID)
-                        .withCANcoderOffset(Constants.Swerve.Mod1.dobOffset)
-                        .withDriveMotorGearRatio(Constants.Swerve.gearRatio)
-                        .withSteerMotorGearRatio(Constants.Swerve.angleGearRatio)
-                        .withWheelRadius(2)
-                        .withSteerMotorGains(steerGains)
-                        .withDriveMotorGains(driveGains)
-                        .withSlipCurrent(400)
-                        .withLocationX(0.260)
-                        .withLocationY(-0.222),
+            // Front Right
+            constants.createModuleConstants(
+                Constants.Swerve.Mod1.canCoderID,
+                Constants.Swerve.Mod1.driveMotorID,
+                Constants.Swerve.Mod1.angleMotorID,
+                Constants.Swerve.Mod1.dobOffset,
+                Constants.Swerve.wheelBase / 2.0, 
+                -Constants.Swerve.trackWidth / 2.0), 
+                // 0.260,
+                // -0.222),
+            
+            // Back Left
+            constants.createModuleConstants(
+                Constants.Swerve.Mod2.canCoderID,
+                Constants.Swerve.Mod2.driveMotorID,
+                Constants.Swerve.Mod2.angleMotorID,
+                Constants.Swerve.Mod2.dobOffset,
+                -Constants.Swerve.wheelBase / 2.0, 
+                Constants.Swerve.trackWidth / 2.0), 
+                // -0.260,
+                // 0.222),
 
-                new SwerveModuleConstants().withCANcoderId(Constants.Swerve.Mod2.canCoderID)
-                        .withDriveMotorId(Constants.Swerve.Mod2.driveMotorID)
-                        .withSteerMotorId(Constants.Swerve.Mod2.angleMotorID)
-                        .withCANcoderOffset(Constants.Swerve.Mod2.dobOffset)
-                        .withDriveMotorGearRatio(Constants.Swerve.gearRatio)
-                        .withSteerMotorGearRatio(Constants.Swerve.angleGearRatio)
-                        .withWheelRadius(2)
-                        .withSteerMotorGains(steerGains)
-                        .withDriveMotorGains(driveGains)
-                        .withSlipCurrent(400)
-                        .withLocationX(-0.260)
-                        .withLocationY(0.222),
-
-                new SwerveModuleConstants().withCANcoderId(Constants.Swerve.Mod3.canCoderID)
-                        .withDriveMotorId(Constants.Swerve.Mod3.driveMotorID)
-                        .withSteerMotorId(Constants.Swerve.Mod3.angleMotorID)
-                        .withCANcoderOffset(Constants.Swerve.Mod3.dobOffset)
-                        .withDriveMotorGearRatio(Constants.Swerve.gearRatio)
-                        .withSteerMotorGearRatio(Constants.Swerve.angleGearRatio)
-                        .withWheelRadius(2)
-                        .withSteerMotorGains(steerGains)
-                        .withDriveMotorGains(driveGains)
-                        .withSlipCurrent(400)
-                        .withLocationY(-0.260)
-                        .withLocationX(-0.222) );
+            // Back Right
+            constants.createModuleConstants(
+                Constants.Swerve.Mod3.canCoderID,
+                Constants.Swerve.Mod3.driveMotorID,
+                Constants.Swerve.Mod3.angleMotorID,
+                Constants.Swerve.Mod3.dobOffset,
+                -Constants.Swerve.wheelBase / 2.0, 
+                -Constants.Swerve.trackWidth / 2.0)
+                // -0.260,
+                // -0.222) 
+            );
 
         // mSwerveMods = new SwerveModule[] {
         // new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -278,13 +290,11 @@ public class Drivetrain implements Subsystem {
                 controller.getRightX()) * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND;
         periodicIO.robotOrientedModifier = controller.getLeftTriggerAxis() > 0.25;
 
-        // periodicIO.modifiedJoystickX = -slewX
-        //         .calculate(-controller.getLeftX() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND));
-        // periodicIO.modifiedJoystickY = -slewY
-        //         .calculate(-controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND));
+         periodicIO.modifiedJoystickX = slewX.calculate(-controller.getLeftX() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND));
+         periodicIO.modifiedJoystickY = slewY.calculate(-controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND));
 
-        periodicIO.modifiedJoystickX = controller.getLeftX() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND);
-        periodicIO.modifiedJoystickY = controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND);
+        //periodicIO.modifiedJoystickX = controller.getLeftX() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND);
+        //periodicIO.modifiedJoystickY = controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND);
 
         if (limelightLock) {
             periodicIO.modifiedJoystickX = slewX
@@ -294,8 +304,7 @@ public class Drivetrain implements Subsystem {
                     .calculate(MathUtil.clamp(-controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND),
                             -Constants.DRIVE.CRUISING_SPEED, Constants.DRIVE.CRUISING_SPEED));
         }
-        periodicIO.modifiedJoystickR = -slewRot
-                .calculate(-controller.getRightX() * halfWhenCrawl(MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND)) * 0.75;
+        periodicIO.modifiedJoystickR = slewRot.calculate(-controller.getRightX() * halfWhenCrawl(MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND)) * 0.75;
 
         checkButtons();
 
