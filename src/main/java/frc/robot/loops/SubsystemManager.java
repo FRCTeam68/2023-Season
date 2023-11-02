@@ -21,8 +21,7 @@ public class SubsystemManager {
 	private final Object taskRunningLock = new Object();
 	private boolean running;
 	private double timestamp = 0;
-	private double dT = 0;
-
+	private double longLoop = 1, pastT = 0;
 
 	public SubsystemManager(double period){
 		var ss = this;
@@ -34,8 +33,10 @@ public class SubsystemManager {
 						double now = Timer.getFPGATimestamp();
 
 						ss.run();
-
-						dT = now - timestamp;
+						if ((timestamp - pastT) > longLoop){
+							ss.longRun();
+							pastT = timestamp;
+						}
 						timestamp = now;
 					}
 				}
@@ -138,6 +139,12 @@ public class SubsystemManager {
 			}
 		}));
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
+	}
+
+	public synchronized void longRun(){
+		threadPool.submit(() -> subsystems.forEach(subsystem -> {
+			subsystem.longLoop(timestamp);
+		}));
 	}
 
 	public synchronized void start() {

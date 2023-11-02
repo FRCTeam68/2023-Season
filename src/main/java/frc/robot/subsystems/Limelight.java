@@ -2,9 +2,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Robot;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -28,10 +25,7 @@ public class Limelight implements Subsystem {
     private SystemState currentState = SystemState.NEUTRAL;
     private SystemState wantedState = SystemState.NEUTRAL;
 
-    private final XboxController controller;
-
     public Limelight(XboxController controller){
-        this.controller = controller;
         Limelight = NetworkTableInstance.getDefault().getTable("limelight");
         X = Limelight.getEntry("tx");
         Y = Limelight.getEntry("ty");
@@ -92,12 +86,6 @@ public class Limelight implements Subsystem {
     }
 
     @Override
-    public void stop() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public void outputTelemetry(double timestamp){
         SmartDashboard.putBoolean("Has target", getTarget());
         SmartDashboard.putNumber("getX", getXValue());
@@ -107,7 +95,6 @@ public class Limelight implements Subsystem {
 
     @Override
     public boolean checkSystem() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -123,7 +110,6 @@ public class Limelight implements Subsystem {
 
         double steeringAdjust = 0;
         final double heading_error = -X.getDouble(0.0);
-        final double area = A.getDouble(0.0);
 
         final double Kp = 0.03;
         final double min_command = 0.03;
@@ -169,14 +155,17 @@ public class Limelight implements Subsystem {
 
     @Override
     public void zeroSensors() {
-        // TODO Auto-generated method stub
         
     }
 
     @Override
     public String getId() {
-        // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void stop() {
+        
     }
     
 }

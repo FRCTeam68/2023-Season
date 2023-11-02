@@ -7,12 +7,8 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 
 public class Intake implements Subsystem {
@@ -42,8 +38,6 @@ public class Intake implements Subsystem {
 
     private boolean haveCube;
     private boolean haveCone;
-
-    private double currentStateStartTime = 0;
 
     private TalonFX intakeMotor;
 
@@ -95,7 +89,6 @@ public class Intake implements Subsystem {
         }
         if (newState != currentState) {
 			currentState = newState;
-			currentStateStartTime = timestamp;
 		}
     }
 

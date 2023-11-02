@@ -4,18 +4,14 @@ package frc.robot.subsystems;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenixpro.StatusCode;
+import com.ctre.phoenixpro.configs.CANcoderConfiguration;
 import com.ctre.phoenixpro.configs.TalonFXConfiguration;
 import com.ctre.phoenixpro.controls.MotionMagicVoltage;
 import com.ctre.phoenixpro.controls.VoltageOut;
-import com.ctre.phoenixpro.hardware.TalonFX;
-
-import com.ctre.phoenixpro.signals.AbsoluteSensorRangeValue;
-import com.ctre.phoenixpro.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenixpro.signals.SensorDirectionValue;
-
-import com.ctre.phoenixpro.configs.CANcoderConfiguration;
-// import com.ctre.phoenixpro.configs.CurrentLimitsConfigs;
 import com.ctre.phoenixpro.hardware.CANcoder;
+import com.ctre.phoenixpro.hardware.TalonFX;
+import com.ctre.phoenixpro.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenixpro.signals.SensorDirectionValue;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS4Controller;
@@ -24,12 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-//import edu.wpi.first.wpilibj2.command.InstantCommand;
-//import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-//import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
-import frc.robot.auton.commands.ArmWantedStateCommand;
-import frc.robot.auton.commands.IntakeWantedStateCommand;
 
 public class Arm implements Subsystem {
 
@@ -97,8 +88,6 @@ public class Arm implements Subsystem {
     protected double m_rotateEncoderVelocity = 0;
     protected double m_rotateEncoderRotations = 0;
 
-
-    private final Intake m_intake;
     private final PS4Controller m_controller;
     private final PowerDistribution m_PDH; 
 
@@ -106,7 +95,6 @@ public class Arm implements Subsystem {
 
     public Arm(PS4Controller controller, Intake intake){
 
-        m_intake = intake;
         m_controller = controller;
 
         m_PDH = new PowerDistribution();

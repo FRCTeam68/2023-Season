@@ -12,6 +12,10 @@ public interface Subsystem extends edu.wpi.first.wpilibj2.command.Subsystem {
 
 	String getId();
 
+	default void longLoop(double timestamp) {
+
+	}
+
 	default void readPeriodicInputs(double timestamp) {
 
 	}

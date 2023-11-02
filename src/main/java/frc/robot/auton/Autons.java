@@ -1,19 +1,14 @@
 package frc.robot.auton;
 
-import java.util.HashMap;
 import java.util.List;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.BaseAutoBuilder;
-import com.pathplanner.lib.auto.PIDConstants;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.auton.commands.ArmWantedStateCommand;
@@ -70,9 +65,6 @@ public class Autons {
     }
 
     public static Command center1(Drivetrain driveTrain, Arm arm, Intake intake) {
-
-        Command[] fullAuto = TheoryPath.getPathLegs(center, driveTrain);
-
     
         return new SequentialCommandGroup(
                 new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
@@ -223,10 +215,7 @@ public class Autons {
             );
     }
 
-    public static Command clearBlue1(Drivetrain driveTrain, Arm arm, Intake intake){
-        
-        Command[] fullAuto = TheoryPath.getPathLegs(clearBlue, driveTrain);
-          
+    public static Command clearBlue1(Drivetrain driveTrain, Arm arm, Intake intake){          
             
         return new SequentialCommandGroup(
                 new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
@@ -307,10 +296,7 @@ public class Autons {
             );
     }
 
-    public static Command clearRed1(Drivetrain driveTrain, Arm arm, Intake intake){
-        
-        Command[] fullAuto = TheoryPath.getPathLegs(clearRed, driveTrain);
-          
+    public static Command clearRed1(Drivetrain driveTrain, Arm arm, Intake intake){          
         return new SequentialCommandGroup(
                 new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
                 new ArmWantedStateCommand(arm,SystemState.AUTON_HIGH),
@@ -386,10 +372,7 @@ public class Autons {
             );
      }
  
-    public static Command wireCoverBlue1(Drivetrain driveTrain, Arm arm, Intake intake){
-        
-        Command[] fullAuto = TheoryPath.getPathLegs(wireCoverBlue, driveTrain);
-        
+    public static Command wireCoverBlue1(Drivetrain driveTrain, Arm arm, Intake intake){        
             
         return new SequentialCommandGroup(
                 new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
@@ -469,10 +452,7 @@ public class Autons {
             );
     }
 
-    public static Command wireCoverRed1(Drivetrain driveTrain, Arm arm, Intake intake){
-        
-        Command[] fullAuto = TheoryPath.getPathLegs(wireCoverRed, driveTrain);
-        
+    public static Command wireCoverRed1(Drivetrain driveTrain, Arm arm, Intake intake){        
             
         return new SequentialCommandGroup(
                 new InstantCommand(() -> driveTrain.drive(0, 0, 0, true)),
