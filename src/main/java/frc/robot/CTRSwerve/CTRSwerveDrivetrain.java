@@ -13,9 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 
 public class CTRSwerveDrivetrain {
     private final int ModuleCount;
@@ -27,7 +25,6 @@ public class CTRSwerveDrivetrain {
     private SwerveModulePosition[] m_modulePositions;
     private Translation2d[] m_moduleLocations;
     private OdometryThread m_odometryThread;
-    private Field2d m_field;
     private PIDController m_turnPid;
 
     /* Perform swerve module updates in a separate thread to minimize latency */
@@ -74,7 +71,6 @@ public class CTRSwerveDrivetrain {
                                 m_pigeon2.getYaw(), m_pigeon2.getAngularVelocityZ());
 
                 m_odometry.update(Rotation2d.fromDegrees(yawDegrees-180), m_modulePositions);
-                m_field.setRobotPose(m_odometry.getPoseMeters());
 
                 SmartDashboard.putNumber("Successful Daqs", SuccessfulDaqs);
                 SmartDashboard.putNumber("Failed Daqs", FailedDaqs);
@@ -90,7 +86,7 @@ public class CTRSwerveDrivetrain {
         ModuleCount = modules.length;
 
         m_pigeon2 = new Pigeon2(driveTrainConstants.Pigeon2Id, driveTrainConstants.CANbusName);
-        m_pigeon2.setYaw(180);
+        m_pigeon2.setYaw(180); // TODO: Look into this angle changing along with m_odometry.update!!!
 
         m_modules = new CTRSwerveModule[ModuleCount];
         m_modulePositions = new SwerveModulePosition[ModuleCount];
@@ -107,8 +103,6 @@ public class CTRSwerveDrivetrain {
         m_kinematics = new SwerveDriveKinematics(m_moduleLocations);
         m_odometry =
                 new SwerveDriveOdometry(m_kinematics, m_pigeon2.getRotation2d(), getSwervePositions());
-        m_field = new Field2d();
-        SmartDashboard.putData("Field", m_field);
 
         m_turnPid = new PIDController(driveTrainConstants.TurnKp, 0, driveTrainConstants.TurnKd);
         m_turnPid.enableContinuousInput(-Math.PI, Math.PI);
@@ -125,13 +119,6 @@ public class CTRSwerveDrivetrain {
         var swerveStates = m_kinematics.toSwerveModuleStates(speeds);
         for (int i = 0; i < ModuleCount; ++i) {
             m_modules[i].apply(swerveStates[i]);
-        }
-    }
-
-    public void autonDrive(SwerveModuleState[] states) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(states, Constants.Swerve.maxSpeed);
-        for (int i = 0; i < ModuleCount; ++i) {
-            m_modules[i].apply(states[i]);
         }
     }
 

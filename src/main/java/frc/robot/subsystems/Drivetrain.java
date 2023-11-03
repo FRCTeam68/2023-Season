@@ -39,12 +39,6 @@ public class Drivetrain implements Subsystem {
      * RAxis -> Rotate
      */
 
-    public static final double MAX_VOLTAGE = 11.0;
-
-    public static final double MAX_VELOCITY_METERS_PER_SECOND = 5.36;
-
-    public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = Constants.DRIVE.MAX_ROTATE_SPEED_RAD_PER_SEC_EST;
-
     // Actually have no clue what these do. Have too much of a dog brain for this
     public static final double[] XY_Axis_inputBreakpoints = { -1, -0.85, -0.6, -0.12, 0.12, 0.6, 0.85, 1 };
     public static final double[] XY_Axis_outputTable = { -1.0, -0.6, -0.3, 0, 0, 0.3, 0.6, 1.0 };

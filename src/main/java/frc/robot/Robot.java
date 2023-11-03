@@ -20,8 +20,6 @@ import frc.robot.subsystems.Limelight;
 
 public class Robot extends LoggedRobot {
 
-  public static CTREConfigs ctreConfigs;
-
   private Command autonomousCommand;
 
   public static RobotContainer m_robotContainer;
@@ -44,8 +42,6 @@ public class Robot extends LoggedRobot {
 // Logger.getInstance().disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
     Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
-
-    ctreConfigs = new CTREConfigs();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
