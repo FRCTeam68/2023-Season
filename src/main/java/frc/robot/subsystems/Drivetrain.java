@@ -269,6 +269,7 @@ public class Drivetrain implements Subsystem {
 
     @Override
     public void readPeriodicInputs(double timestamp) {
+        double normRot;
 
         periodicIO.VxCmd = -oneDimensionalLookup.interpLinear(XY_Axis_inputBreakpoints, XY_Axis_outputTable,
                 controller.getLeftY()) * MAX_VELOCITY_METERS_PER_SECOND;
@@ -291,12 +292,18 @@ public class Drivetrain implements Subsystem {
                     .calculate(MathUtil.clamp(-controller.getLeftX() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND),
                             -Constants.DRIVE.CRUISING_SPEED, Constants.DRIVE.CRUISING_SPEED));
             periodicIO.modifiedJoystickY = -slewY
-                    .calculate(MathUtil.clamp(-controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND),
+                    .calculate(MathUtil.clamp(controller.getLeftY() * halfWhenCrawl(MAX_VELOCITY_METERS_PER_SECOND),
                             -Constants.DRIVE.CRUISING_SPEED, Constants.DRIVE.CRUISING_SPEED));
         }
-        periodicIO.modifiedJoystickR = -slewRot
-                .calculate(-controller.getRightX() * halfWhenCrawl(MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND)) * 0.75;
+        normRot = -controller.getRightX();
 
+        periodicIO.modifiedJoystickR = -slewRot
+                .calculate(normRot * halfWhenCrawl(MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND)) * 0.75;
+
+        Logger.getInstance().recordOutput("normRot", normRot);
+        Logger.getInstance().recordOutput("normRotScaled", normRot * halfWhenCrawl(MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND)* 0.75);
+        Logger.getInstance().recordOutput("slewedRot", periodicIO.modifiedJoystickR);
+        
         checkButtons();
 
     }

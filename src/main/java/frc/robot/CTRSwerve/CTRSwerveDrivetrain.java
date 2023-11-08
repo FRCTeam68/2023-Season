@@ -126,7 +126,13 @@ public class CTRSwerveDrivetrain {
     }
 
     public void driveRobotCentric(ChassisSpeeds speeds) {
+        // Logger.getInstance().recordOutput("chassisSpeedsRC", speeds);
         var swerveStates = m_kinematics.toSwerveModuleStates(speeds);
+        Logger.getInstance().recordOutput("swerveStatesRC", swerveStates);
+        // Logger.getInstance().recordOutput("swerveState0", swerveStates[0]);
+        // Logger.getInstance().recordOutput("swerveState1", swerveStates[1]);
+        // Logger.getInstance().recordOutput("swerveState2", swerveStates[2]);
+        // Logger.getInstance().recordOutput("swerveState3", swerveStates[3]);
         for (int i = 0; i < ModuleCount; ++i) {
             m_modules[i].apply(swerveStates[i]);
         }
@@ -141,7 +147,9 @@ public class CTRSwerveDrivetrain {
 
     public void driveFieldCentric(ChassisSpeeds speeds) {
         var roboCentric = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, m_pigeon2.getRotation2d());
+        // Logger.getInstance().recordOutput("chassisSpeedsFC", roboCentric);
         var swerveStates = m_kinematics.toSwerveModuleStates(roboCentric);
+        Logger.getInstance().recordOutput("swerveStatesFC", swerveStates);
         for (int i = 0; i < ModuleCount; ++i) {
             m_modules[i].apply(swerveStates[i]);
         }
@@ -149,13 +157,11 @@ public class CTRSwerveDrivetrain {
 
     public void driveFullyFieldCentric(double xSpeeds, double ySpeeds, Rotation2d targetAngle) {
         var currentAngle = m_pigeon2.getRotation2d();
-        double rotationalSpeed =
-                m_turnPid.calculate(currentAngle.getRadians(), targetAngle.getRadians());
-
-        var roboCentric =
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                        xSpeeds, ySpeeds, rotationalSpeed, m_pigeon2.getRotation2d());
+        double rotationalSpeed = m_turnPid.calculate(currentAngle.getRadians(), targetAngle.getRadians());
+        var roboCentric = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeeds, ySpeeds, rotationalSpeed, m_pigeon2.getRotation2d());
+        // Logger.getInstance().recordOutput("chassisSpeedsFFC", roboCentric);
         var swerveStates = m_kinematics.toSwerveModuleStates(roboCentric);
+        Logger.getInstance().recordOutput("swerveStatesFFC", swerveStates);
         for (int i = 0; i < ModuleCount; ++i) {
             m_modules[i].apply(swerveStates[i]);
         }

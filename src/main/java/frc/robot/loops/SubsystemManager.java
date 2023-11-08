@@ -124,7 +124,7 @@ public class SubsystemManager {
 
 		var dt = Timer.getFPGATimestamp() - ost;
 		if(dt > .02){
-			// DriverStation.reportWarning(String.format("Loop overrun [%s], skipping telemetry...",dt), false);
+			DriverStation.reportWarning(String.format("Loop overrun [%s], skipping telemetry...",dt), false);
 			return;
 		}
 
@@ -134,7 +134,7 @@ public class SubsystemManager {
 			double et = Timer.getFPGATimestamp();
 
 			if (et - st > 0.01) {
-//				DriverStation.reportError(String.format("%s.outputTelemetry took too long: %s", subsystem.getId(), et - st), false);
+				DriverStation.reportError(String.format("%s.outputTelemetry took too long: %s", subsystem.getId(), et - st), false);
 			}
 		}));
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
