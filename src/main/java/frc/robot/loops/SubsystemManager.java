@@ -95,7 +95,7 @@ public class SubsystemManager {
 			double et = Timer.getFPGATimestamp();
 
 			if (et - st > 0.01) {
-				// Logger.getInstance().recordOutput("readOverrun", String.format("%s.readPeriodicInputs took too long: %s", subsystem.getId(), et - st));
+				Logger.getInstance().recordOutput("Overrun", String.format("%s.read  : %s", subsystem.getId(), et - st));
 				// DriverStation.reportError(String.format("%s.readPeriodicInputs took too long: %s", subsystem.getId(), et - st), false);
 			}
 		}));
@@ -108,7 +108,7 @@ public class SubsystemManager {
 			double et = Timer.getFPGATimestamp();
 
 			if (et - st > 0.01) {
-				// Logger.getInstance().recordOutput("onLoopOverrun", String.format("%s.onLoop took too long: %s", loop.getId(), et - st));
+				Logger.getInstance().recordOutput("Overrun", String.format("%s.onLoop: %s", loop.getId(), et - st));
 				// DriverStation.reportError(String.format("%s.onLoop took too long: %s", loop.getId(), et - st), false);
 			}
 		}));
@@ -121,7 +121,7 @@ public class SubsystemManager {
 			double et = Timer.getFPGATimestamp();
 
 			if (et - st > 0.01) {
-				// Logger.getInstance().recordOutput("writeOverrun", String.format("%s.writePeriodicOutputs took too long: %s", subsystem.getId(), et - st));
+				Logger.getInstance().recordOutput("Overrun", String.format("%s.write : %s", subsystem.getId(), et - st));
 				// DriverStation.reportError(String.format("%s.writePeriodicOutputs took too long: %s", subsystem.getId(), et - st), false);
 			}
 		}));
@@ -130,7 +130,7 @@ public class SubsystemManager {
 
 		var dt = Timer.getFPGATimestamp() - ost;
 		if(dt > .02){
-			// Logger.getInstance().recordOutput("wholeloopOverrun", String.format("Loop overrun [%s], skipping telemetry...: %s", dt));
+			Logger.getInstance().recordOutput("Overrun", String.format("whole loop overrun : %s", dt));
 			DriverStation.reportWarning(String.format("Loop overrun [%s], skipping telemetry...",dt), false);
 			return;
 		}
@@ -141,7 +141,7 @@ public class SubsystemManager {
 			double et = Timer.getFPGATimestamp();
 
 			if (et - st > 0.01) {
-				// Logger.getInstance().recordOutput("telemetryOverrun", String.format("%s.outputTelemetry took too long: %s", subsystem.getId(), et - st));
+				Logger.getInstance().recordOutput("Overrun", String.format("%s.Telem : %s", subsystem.getId(), et - st));
 				// DriverStation.reportError(String.format("%s.outputTelemetry took too long: %s", subsystem.getId(), et - st), false);
 			}
 		}));
