@@ -27,6 +27,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
+    System.out.println("hello");
     Logger.getInstance().recordMetadata("2023 KARLBOT", "RUNNING TODAY"); // Set a metadata value
 
     if (isReal()) {
@@ -39,7 +40,7 @@ public class Robot extends LoggedRobot {
         Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
     }
 
-// Logger.getInstance().disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
+// Logger.getInstance().getInstance().disableDeterministicTimestamps() // See "Deterministic Timestamps" in the "Understanding Data Flow" page
     Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
@@ -119,4 +120,16 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void simulationPeriodic() {}
+
+  @Override
+  public void startCompetition() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void endCompetition() {
+    // TODO Auto-generated method stub
+    
+  }
 }

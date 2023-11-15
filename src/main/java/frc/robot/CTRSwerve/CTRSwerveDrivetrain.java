@@ -2,8 +2,6 @@ package frc.robot.CTRSwerve;
 
 import com.ctre.phoenixpro.BaseStatusSignalValue;
 import com.ctre.phoenixpro.hardware.Pigeon2;
-import com.pathplanner.lib.PathPlannerTrajectory;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -156,12 +154,6 @@ public class CTRSwerveDrivetrain {
         m_odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getSwervePositions(), new Pose2d(0, 0, new Rotation2d()));
     }
 
-    public void initAutonPosition(PathPlannerTrajectory.PathPlannerState state) {
-        // ErrorCode errorCode = pigeon.setYaw(state.holonomicRotation.getDegrees(),
-        // 100);
-        m_odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getSwervePositions(),
-                new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation));
-    }
 
     public void resetPose(Pose2d odo) {
         m_odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getSwervePositions(), odo);

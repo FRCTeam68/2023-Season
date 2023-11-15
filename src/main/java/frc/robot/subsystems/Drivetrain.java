@@ -1,8 +1,6 @@
 
 package frc.robot.subsystems;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenixpro.configs.Slot0Configs;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
@@ -191,12 +189,11 @@ public class Drivetrain implements Subsystem {
     @Override
     public void writePeriodicOutputs(double timestamp) {
         ChassisSpeeds chassis = new ChassisSpeeds(0,0,0);
-        Logger.getInstance().recordOutput("ACtual Pose", drivetrain.getOdometry().getPoseMeters());
+
 
         switch (currentState) {
             case TRAJECTORY_FOLLOWING:
                 SwerveDriveKinematics.desaturateWheelSpeeds(trajectoryStates, Constants.Swerve.maxSpeed);
-                Logger.getInstance().recordOutput("Swerve Module States", trajectoryStates);
                 chassis = drivetrain.getKinematics().toChassisSpeeds(trajectoryStates[0], trajectoryStates[1], trajectoryStates[2], trajectoryStates[3]
                 );
                 break;
@@ -309,6 +306,8 @@ public class Drivetrain implements Subsystem {
     }
 
     public void initAutonPosition(PathPlannerTrajectory.PathPlannerState state) {
+        // ErrorCode errorCode = pigeon.setYaw(state.holonomicRotation.getDegrees(),
+        // 100);
         drivetrain.getOdometry().resetPosition(getYaw(), getModulePositions(),
                 new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation));
     }

@@ -128,7 +128,7 @@ public class SubsystemManager {
 			DriverStation.reportError(String.format("Loop overrun [%s], skipping telemetry...",dt), false);
 			return;
 		}
-
+ 
 		threadPool.submit(() -> subsystems.parallelStream().forEach(subsystem -> {
 			double st = Timer.getFPGATimestamp();
 			subsystem.outputTelemetry(timestamp);
