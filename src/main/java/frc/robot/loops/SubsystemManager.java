@@ -25,6 +25,7 @@ public class SubsystemManager {
 	private boolean running;
 	private double timestamp = 0;
 	private double dT = 0;
+	private double loopcnt = 0;
 
 
 	public SubsystemManager(double period){
@@ -88,6 +89,8 @@ public class SubsystemManager {
 
 	public synchronized void run() {
 		double ost = Timer.getFPGATimestamp();
+		loopcnt += 1;
+		Logger.getInstance().recordOutput("Overrun", String.format("%s-startloop  : %s", loopcnt, ost));
 
 		threadPool.submit(() -> subsystems.parallelStream().forEach(subsystem -> {
 			double st = Timer.getFPGATimestamp();
@@ -102,6 +105,7 @@ public class SubsystemManager {
 
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
 
+		Logger.getInstance().recordOutput("Overrun", String.format("%s-startProcessLoop  : %s", loopcnt, Timer.getFPGATimestamp()));
 		threadPool.submit(() -> subsystems.parallelStream().forEach(loop -> {
 			double st = Timer.getFPGATimestamp();
 			loop.processLoop(st);
@@ -115,6 +119,7 @@ public class SubsystemManager {
 
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
 
+		Logger.getInstance().recordOutput("Overrun", String.format("%s-startWrite  : %s", loopcnt, Timer.getFPGATimestamp()));
 		threadPool.submit(() -> subsystems.parallelStream().forEach(subsystem -> {
 			double st = Timer.getFPGATimestamp();
 			subsystem.writePeriodicOutputs(st);
@@ -128,7 +133,11 @@ public class SubsystemManager {
 
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
 
-		var dt = Timer.getFPGATimestamp() - ost;
+		var dt = Timer.getFPGATimestamp();
+		Logger.getInstance().recordOutput("Overrun", String.format("%s-startTelem  : %s", loopcnt, dt));
+		
+		dt = dt - ost;
+		Logger.getInstance().recordOutput("Overrun", String.format("%s-looptimebeforeTelem  : %s", loopcnt, dt));
 		if(dt > .02){
 			Logger.getInstance().recordOutput("Overrun", String.format("whole loop overrun : %s", dt));
 			DriverStation.reportWarning(String.format("Loop overrun [%s], skipping telemetry...",dt), false);
@@ -146,6 +155,8 @@ public class SubsystemManager {
 			}
 		}));
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
+
+		Logger.getInstance().recordOutput("Overrun", String.format("%s-endloop  : %s", loopcnt, Timer.getFPGATimestamp()));
 	}
 
 	public synchronized void start() {
