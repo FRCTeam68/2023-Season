@@ -52,6 +52,10 @@ public class Intake implements Subsystem {
     private double m_IntakeStatorCurrent = 0;
     private double m_intakePercentOut = 0;
 
+    private double m_readCnt = 0;
+    private double m_processCnt = 0;
+    private double m_writeCnt = 0;
+    private double m_telemCnt = 0;
 
     public Intake(PS4Controller controller){
         intakeMotor = new TalonFX(Constants.INTAKE.INTAKE_MOTOR, "MANIPbus");
@@ -69,6 +73,9 @@ public class Intake implements Subsystem {
 
     @Override
     public void processLoop(double timestamp) {
+        m_processCnt+=1;
+        Logger.getInstance().recordOutput("I2", m_processCnt);
+
         // TODO Auto-generated method stub
         SystemState newState;
         switch (currentState){
@@ -101,6 +108,8 @@ public class Intake implements Subsystem {
 
     @Override
     public void readPeriodicInputs(double timestamp){
+        m_readCnt+=1;
+        Logger.getInstance().recordOutput("I1", m_readCnt);
 
         m_IntakeStatorCurrent = intakeMotor.getStatorCurrent();
 
@@ -143,6 +152,9 @@ public class Intake implements Subsystem {
 
     @Override
     public void writePeriodicOutputs(double timestamp){
+        m_writeCnt+=1;
+        Logger.getInstance().recordOutput("I3", m_writeCnt);
+
         switch(currentState){
 
             case INTAKING_CONE:
@@ -195,6 +207,9 @@ public class Intake implements Subsystem {
     }
     @Override
     public void outputTelemetry(double timestamp){
+        m_telemCnt+=1;
+        Logger.getInstance().recordOutput("I4", m_telemCnt);
+
         // Logger log = Logger.getInstance();
 
         // log.recordOutput("Intake State", currentState.toString());

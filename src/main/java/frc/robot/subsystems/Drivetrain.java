@@ -155,6 +155,11 @@ public class Drivetrain implements Subsystem {
     private boolean balancedX = false, balancedY = false;
     private boolean crawling = false;
 
+    private double m_readCnt = 0;
+    private double m_processCnt = 0;
+    private double m_writeCnt = 0;
+    private double m_telemCnt = 0;
+
     public Drivetrain(XboxController controller) {
         ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
         // yawCtrl.enableContinuousInput(-Math.PI, Math.PI); //TODO check if Pigeon
@@ -234,6 +239,10 @@ public class Drivetrain implements Subsystem {
 
     @Override
     public void processLoop(double timestamp) {
+
+        m_processCnt+=1;
+        Logger.getInstance().recordOutput("D2", m_processCnt);
+
         SystemState newState;
         switch (currentState) {
             default:
@@ -270,6 +279,9 @@ public class Drivetrain implements Subsystem {
     @Override
     public void readPeriodicInputs(double timestamp) {
         double normRot;
+
+        m_readCnt+=1;
+        Logger.getInstance().recordOutput("D1", m_readCnt);
 
         periodicIO.VxCmd = -oneDimensionalLookup.interpLinear(XY_Axis_inputBreakpoints, XY_Axis_outputTable,
                 controller.getLeftY()) * MAX_VELOCITY_METERS_PER_SECOND;
@@ -310,6 +322,10 @@ public class Drivetrain implements Subsystem {
 
     @Override
     public void writePeriodicOutputs(double timestamp) {
+
+        m_writeCnt+=1;
+        Logger.getInstance().recordOutput("D3", m_writeCnt);
+
         ChassisSpeeds chassis = new ChassisSpeeds(0,0,0);
         //Logger.getInstance().recordOutput("ACtual Pose", drivetrain.getOdometry().getPoseMeters());
 
@@ -521,6 +537,8 @@ public class Drivetrain implements Subsystem {
 
     @Override
     public void outputTelemetry(double timestamp) {
+        m_telemCnt+=1;
+        Logger.getInstance().recordOutput("D4", m_telemCnt);
 
         // SmartDashboard.putString("drivetrain/currentState", currentState.toString());
         // SmartDashboard.putString("drivetrain/wantedState", wantedState.toString());

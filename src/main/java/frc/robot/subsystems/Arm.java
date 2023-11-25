@@ -104,7 +104,10 @@ public class Arm implements Subsystem {
 
     private boolean m_manualMode = false;
 
-    private double loopcnt = 0;
+    private double m_readCnt = 0;
+    private double m_processCnt = 0;
+    private double m_writeCnt = 0;
+    private double m_telemCnt = 0;
 
     public Arm(PS4Controller controller, Intake intake){
 
@@ -261,8 +264,8 @@ public class Arm implements Subsystem {
     @Override
     public void processLoop(double timestamp) {
         
-        loopcnt+=1;
-        Logger.getInstance().recordOutput("LogArm", String.format("%s-ArmProcess", loopcnt));
+        m_processCnt+=1;
+        Logger.getInstance().recordOutput("A2", m_processCnt);
 
          SystemState newState;
          switch(m_currentState){
@@ -313,8 +316,9 @@ public class Arm implements Subsystem {
     @Override
     public void readPeriodicInputs(double timestamp) {
   
-        loopcnt+=1;
-        Logger.getInstance().recordOutput("LogArm", String.format("%s-ArmRead", loopcnt));
+        m_readCnt+=1;
+        Logger.getInstance().recordOutput("A1", m_readCnt);
+
 
         m_extendLimitSwitchHit = m_extendLimitSwitch.get();
         m_rotateLimitSwitchHit = m_rotateLimitSwitch.get();
@@ -416,8 +420,8 @@ public class Arm implements Subsystem {
     @Override
     public void writePeriodicOutputs(double timestamp)
     {
-        loopcnt+=1;
-        Logger.getInstance().recordOutput("LogArm", String.format("%s-ArmWrite", loopcnt));
+        m_writeCnt+=1;
+        Logger.getInstance().recordOutput("A3", m_writeCnt);
 
         switch (m_currentState){
             case GROUND_ANGLE:
@@ -515,8 +519,8 @@ public class Arm implements Subsystem {
 
     @Override
     public void outputTelemetry(double timestamp){
-        loopcnt+=1;
-        Logger.getInstance().recordOutput("LogArm", String.format("%s-ArmTelem", loopcnt));
+        m_telemCnt+=1;
+        Logger.getInstance().recordOutput("A4", m_telemCnt);
 
         // Logger log = Logger.getInstance();
 

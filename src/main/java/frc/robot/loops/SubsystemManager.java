@@ -25,7 +25,11 @@ public class SubsystemManager {
 	private boolean running;
 	private double timestamp = 0;
 	private double dT = 0;
-	private double loopcnt = 0;
+
+	private double m_readCnt = 0;
+    private double m_processCnt = 0;
+    private double m_writeCnt = 0;
+    private double m_telemCnt = 0;
 
 
 	public SubsystemManager(double period){
@@ -89,44 +93,58 @@ public class SubsystemManager {
 
 	public synchronized void run() {
 		double ost = Timer.getFPGATimestamp();
-		loopcnt += 1;
-		Logger.getInstance().recordOutput("Overrun", String.format("%s-startloop  : %s", loopcnt, ost));
+
+		m_readCnt+=1;
+		Logger.getInstance().recordOutput("L1", m_readCnt);
 
 		threadPool.submit(() -> subsystems.parallelStream().forEach(subsystem -> {
 			double st = Timer.getFPGATimestamp();
 			subsystem.readPeriodicInputs(st);
 			double et = Timer.getFPGATimestamp();
 
+			Logger.getInstance().recordOutput("N1", subsystem.getId().toString());
+			Logger.getInstance().recordOutput("D1", et - st);
+
 			if (et - st > 0.01) {
-				Logger.getInstance().recordOutput("Overrun", String.format("%s.read  : %s", subsystem.getId(), et - st));
+				Logger.getInstance().recordOutput("O1", true);;
 				// DriverStation.reportError(String.format("%s.readPeriodicInputs took too long: %s", subsystem.getId(), et - st), false);
 			}
 		}));
 
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
 
-		Logger.getInstance().recordOutput("Overrun", String.format("%s-startProcessLoop  : %s", loopcnt, Timer.getFPGATimestamp()));
+		m_processCnt+=1;
+		Logger.getInstance().recordOutput("L2", m_processCnt);
+
 		threadPool.submit(() -> subsystems.parallelStream().forEach(loop -> {
 			double st = Timer.getFPGATimestamp();
 			loop.processLoop(st);
 			double et = Timer.getFPGATimestamp();
+			
+			Logger.getInstance().recordOutput("N2", loop.getId().toString());
+			Logger.getInstance().recordOutput("D2", et - st);
 
 			if (et - st > 0.01) {
-				Logger.getInstance().recordOutput("Overrun", String.format("%s.onLoop: %s", loop.getId(), et - st));
+				Logger.getInstance().recordOutput("O2", true);;
 				// DriverStation.reportError(String.format("%s.onLoop took too long: %s", loop.getId(), et - st), false);
 			}
 		}));
 
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
 
-		Logger.getInstance().recordOutput("Overrun", String.format("%s-startWrite  : %s", loopcnt, Timer.getFPGATimestamp()));
+		m_writeCnt+=1;
+		Logger.getInstance().recordOutput("L3", m_writeCnt);
+
 		threadPool.submit(() -> subsystems.parallelStream().forEach(subsystem -> {
 			double st = Timer.getFPGATimestamp();
 			subsystem.writePeriodicOutputs(st);
 			double et = Timer.getFPGATimestamp();
 
+			Logger.getInstance().recordOutput("N3", subsystem.getId().toString());
+			Logger.getInstance().recordOutput("D3", et - st);
+
 			if (et - st > 0.01) {
-				Logger.getInstance().recordOutput("Overrun", String.format("%s.write : %s", subsystem.getId(), et - st));
+				Logger.getInstance().recordOutput("O3", true);;
 				// DriverStation.reportError(String.format("%s.writePeriodicOutputs took too long: %s", subsystem.getId(), et - st), false);
 			}
 		}));
@@ -134,29 +152,33 @@ public class SubsystemManager {
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
 
 		var dt = Timer.getFPGATimestamp();
-		Logger.getInstance().recordOutput("Overrun", String.format("%s-startTelem  : %s", loopcnt, dt));
-		
 		dt = dt - ost;
-		Logger.getInstance().recordOutput("Overrun", String.format("%s-looptimebeforeTelem  : %s", loopcnt, dt));
+
+		Logger.getInstance().recordOutput("D39", dt);
+
 		if(dt > .02){
-			Logger.getInstance().recordOutput("Overrun", String.format("whole loop overrun : %s", dt));
+			Logger.getInstance().recordOutput("O39", true);;
 			DriverStation.reportWarning(String.format("Loop overrun [%s], skipping telemetry...",dt), false);
 			return;
 		}
+
+		m_telemCnt+=1;
+		Logger.getInstance().recordOutput("L39", m_telemCnt);
 
 		threadPool.submit(() -> subsystems.parallelStream().forEach(subsystem -> {
 			double st = Timer.getFPGATimestamp();
 			subsystem.outputTelemetry(timestamp);
 			double et = Timer.getFPGATimestamp();
 
+			Logger.getInstance().recordOutput("N4", subsystem.getId().toString());
+			Logger.getInstance().recordOutput("D4", et - st);
+
 			if (et - st > 0.01) {
-				Logger.getInstance().recordOutput("Overrun", String.format("%s.Telem : %s", subsystem.getId(), et - st));
+				Logger.getInstance().recordOutput("O4", true);;
 				// DriverStation.reportError(String.format("%s.outputTelemetry took too long: %s", subsystem.getId(), et - st), false);
 			}
 		}));
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
-
-		Logger.getInstance().recordOutput("Overrun", String.format("%s-endloop  : %s", loopcnt, Timer.getFPGATimestamp()));
 	}
 
 	public synchronized void start() {
