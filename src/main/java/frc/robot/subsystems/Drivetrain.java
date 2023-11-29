@@ -312,6 +312,8 @@ public class Drivetrain implements Subsystem {
         periodicIO.modifiedJoystickR = -slewRot
                 .calculate(normRot * halfWhenCrawl(MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND)) * 0.75;
 
+        Logger.getInstance().recordOutput("modifiedJoystickX", periodicIO.modifiedJoystickX);
+        Logger.getInstance().recordOutput("modifiedJoystickY", periodicIO.modifiedJoystickY);
         Logger.getInstance().recordOutput("normRot", normRot);
         Logger.getInstance().recordOutput("normRotScaled", normRot * halfWhenCrawl(MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND)* 0.75);
         Logger.getInstance().recordOutput("slewedRot", periodicIO.modifiedJoystickR);
