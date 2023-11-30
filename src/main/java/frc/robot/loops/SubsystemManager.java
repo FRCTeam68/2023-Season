@@ -102,11 +102,10 @@ public class SubsystemManager {
 			subsystem.readPeriodicInputs(st);
 			double et = Timer.getFPGATimestamp();
 
-			Logger.getInstance().recordOutput("N1", subsystem.getId().toString());
-			Logger.getInstance().recordOutput("D1", et - st);
-
 			if (et - st > 0.01) {
-				Logger.getInstance().recordOutput("O1", true);;
+				Logger.getInstance().recordOutput("L1name", subsystem.getId().toString());
+				Logger.getInstance().recordOutput("L1delta", et - st);
+				Logger.getInstance().recordOutput("L1over", true);;
 				// DriverStation.reportError(String.format("%s.readPeriodicInputs took too long: %s", subsystem.getId(), et - st), false);
 			}
 		}));
@@ -121,12 +120,15 @@ public class SubsystemManager {
 			loop.processLoop(st);
 			double et = Timer.getFPGATimestamp();
 			
-			Logger.getInstance().recordOutput("N2", loop.getId().toString());
-			Logger.getInstance().recordOutput("D2", et - st);
+			Logger.getInstance().recordOutput("L2name", loop.getId().toString());
+			Logger.getInstance().recordOutput("L2delta", et - st);
 
 			if (et - st > 0.01) {
-				Logger.getInstance().recordOutput("O2", true);;
+				Logger.getInstance().recordOutput("L2over", true);
 				// DriverStation.reportError(String.format("%s.onLoop took too long: %s", loop.getId(), et - st), false);
+			}
+			else{
+				Logger.getInstance().recordOutput("L2over", false);
 			}
 		}));
 
@@ -140,12 +142,15 @@ public class SubsystemManager {
 			subsystem.writePeriodicOutputs(st);
 			double et = Timer.getFPGATimestamp();
 
-			Logger.getInstance().recordOutput("N3", subsystem.getId().toString());
-			Logger.getInstance().recordOutput("D3", et - st);
+			Logger.getInstance().recordOutput("L3name", subsystem.getId().toString());
+			Logger.getInstance().recordOutput("L3delta", et - st);
 
 			if (et - st > 0.01) {
-				Logger.getInstance().recordOutput("O3", true);;
+				Logger.getInstance().recordOutput("L3over", true);;
 				// DriverStation.reportError(String.format("%s.writePeriodicOutputs took too long: %s", subsystem.getId(), et - st), false);
+			}
+			else{
+				Logger.getInstance().recordOutput("L3over", false);
 			}
 		}));
 
@@ -157,25 +162,31 @@ public class SubsystemManager {
 		Logger.getInstance().recordOutput("D39", dt);
 
 		if(dt > .02){
-			Logger.getInstance().recordOutput("O39", true);;
+			Logger.getInstance().recordOutput("L39over", true);;
 			DriverStation.reportWarning(String.format("Loop overrun [%s], skipping telemetry...",dt), false);
 			return;
 		}
+		else{
+			Logger.getInstance().recordOutput("L39over", false);
+		}
 
 		m_telemCnt+=1;
-		Logger.getInstance().recordOutput("L39", m_telemCnt);
+		Logger.getInstance().recordOutput("L4", m_telemCnt);
 
 		threadPool.submit(() -> subsystems.parallelStream().forEach(subsystem -> {
 			double st = Timer.getFPGATimestamp();
 			subsystem.outputTelemetry(timestamp);
 			double et = Timer.getFPGATimestamp();
 
-			Logger.getInstance().recordOutput("N4", subsystem.getId().toString());
-			Logger.getInstance().recordOutput("D4", et - st);
+			Logger.getInstance().recordOutput("L4name", subsystem.getId().toString());
+			Logger.getInstance().recordOutput("L4delta", et - st);
 
 			if (et - st > 0.01) {
-				Logger.getInstance().recordOutput("O4", true);;
+				Logger.getInstance().recordOutput("L4over", true);;
 				// DriverStation.reportError(String.format("%s.outputTelemetry took too long: %s", subsystem.getId(), et - st), false);
+			}
+			else{
+				Logger.getInstance().recordOutput("L4over", false);
 			}
 		}));
 		threadPool.awaitQuiescence(10, TimeUnit.MILLISECONDS);
