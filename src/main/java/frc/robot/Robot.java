@@ -37,6 +37,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {
+    System.out.println("********** Robot Init Start **********");
     Logger.getInstance().recordMetadata("Argentina", "Main Branch"); // Set a metadata value
 
     if (isReal()) {
@@ -80,6 +81,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousInit() {
+    System.out.println("********** Auton Init Start **********");
     m_robotContainer.enableState = RobotContainer.EnableState.AUTON;
     m_robotContainer.drivetrain.getBaseDrivetrain().resetOdometry();
 
