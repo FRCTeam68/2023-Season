@@ -229,4 +229,11 @@ public class CTRSwerveDrivetrain {
     public double getFailedDaqs() {
         return m_odometryThread.FailedDaqs;
     }
+
+    public void displaySwerveModuleOffsetInfo(){
+        System.out.println("FL-0, FR-1, BL-2, BR-3");
+        for (int i = 0; i < ModuleCount; ++i) {
+            m_modules[i].displaySwerveModuleOffsetInfo(i);
+        }
+    }
 }

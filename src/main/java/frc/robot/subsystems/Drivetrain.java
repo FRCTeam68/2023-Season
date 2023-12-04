@@ -430,6 +430,14 @@ public class Drivetrain implements Subsystem {
             balancedX = true;
         }
 
+        if (controller.getStartButtonPressed()){
+            //get info for zeroing the swerve modules
+            //when pos is 0, then absolution position will give you what we should set our magnet offset in code.
+            //the magoffset is the current setting from our code.  If it matches absolute offset when pos is zero,
+            //then there is no update to magnet offset needed for that swerve module.
+            drivetrain.displaySwerveModuleOffsetInfo();
+        }
+
         //BGRC - remove because will not use
         // if (controller.getRightBumper())
         //     limelightLock = true;
@@ -581,7 +589,6 @@ public class Drivetrain implements Subsystem {
         //SmartDashboard.putNumber("Goal Angle", (getYaw().getRadians() - Math.toRadians(yawToLock)));
         //SmartDashboard.putNumber("Pitch", pitchAngle);
         //SmartDashboard.putNumber("Goal switch", lockToPi(Math.toRadians(yawToLock) + Math.PI * 2));
-
     }
 
     public void setWantedState(WantedState wantedState) {
@@ -665,4 +672,5 @@ public class Drivetrain implements Subsystem {
         // TODO Auto-generated method stub
         return false;
     }
+
 }

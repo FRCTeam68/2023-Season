@@ -127,4 +127,18 @@ public class CTRSwerveModule {
     BaseStatusSignalValue[] getSignals() {
         return m_signals;
     }
+
+    public void displaySwerveModuleOffsetInfo(int moduleNum){
+        int id = m_cancoder.getDeviceID();
+        double pos = m_cancoder.getPosition().getValue();
+        double abspos = m_cancoder.getPosition().getValue();
+        double magoffset = pos - abspos;
+
+        System.out.println(String.format("Module%s, ID: %s, Pos:%s, AbsPos:%s, MagOffset:%s", 
+                                            moduleNum, id, pos, abspos, magoffset));
+        SmartDashboard.putNumber(String.format("Module%s_ID", moduleNum), id);
+        SmartDashboard.putNumber(String.format("Module%s_Pos", moduleNum), pos);
+        SmartDashboard.putNumber(String.format("Module%s_AbsPos", moduleNum), abspos);
+        SmartDashboard.putNumber(String.format("Module%s_MagOffset", moduleNum), pos-abspos);
+    }
 }
